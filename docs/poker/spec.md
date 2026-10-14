@@ -4,7 +4,7 @@
 디자인 시안(확정): `docs/poker/design/` 의 (캔버스 원본: https://claude.ai/artifact/1zWkUfQ5dTz9X1bqn3kwqu) `Main.dc.html`(로비), `Game.dc.html`(게임), `Result.dc.html`(결과), `Cards.dc.html`(카드 덱). 색은 시안의 hex 대신 앱 테마 토큰으로 옮긴다.
 
 ## 게임 규칙
-- 2인(커플 두 사람). 덱 = 1~20 한 벌 + 조커(값 21) = 21장. 판마다 덱에서 2장을 뽑아 한 장씩. 덱이 2장 미만이면 21장 전체를 다시 섞는다.
+- 2인(커플 두 사람). 카드 = 1~20 한 벌 + 조커(값 21) = 21장. **판마다 21장을 새로 섞어** 2장을 뽑아 한 장씩 (남은 덱을 두지 않는다 — 지난 판 카드로 내 카드를 짐작하는 카드 세기 방지, 2026-10-14 결정).
 - 자기 카드는 못 보고 상대 카드만 본다. 무승부 없음(모든 카드가 다름). 조커는 모든 숫자를 이긴다.
 - 술 단위 q: 1q = ¼잔. 게임 설정: `base_q` ∈ {1,2} (기본 판돈, 기본 1), `max_q` ∈ {2,4,6} (최대 판돈, 기본 4), `water_q` ∈ {4,8,12} (물 한 잔 타임 간격, 기본 8).
 - 판 시작: `pot_q = base_q`. 선(先)은 판마다 번갈아 (홀수 판 = 게임 만든 사람, 짝수 판 = 상대).
@@ -31,7 +31,7 @@
 - `poker_hands`: `round_id uuid references poker_rounds on delete cascade`, `user_id uuid` (카드를 이마에 붙인 사람), `couple_id`, `card smallint check (card between 1 and 21)`, pk `(round_id, user_id)`.
   **select 정책: 같은 커플 AND (`user_id <> auth.uid()` OR 그 판이 `done`)** — 진행 중인 판의 내 카드는 절대 못 읽는다. (이 표가 핵심 보안.)
 - `poker_peeks`: `round_id`, `user_id`, `couple_id`, `hint text check (hint in ('3','4','5','lonely'))`, pk `(round_id,user_id)`. select 정책: `user_id = auth.uid()` 만.
-- 덱: `private.poker_decks(game_id uuid pk references public.poker_games on delete cascade, cards smallint[] not null)` — private 스키마, authenticated 권한 없음(REST 비노출). 다음 카드가 새지 않게.
+- (덱 표는 두지 않는다 — 판마다 새로 섞으므로 다음 카드가 미리 정해져 있지 않다.)
 
 RPC (모두 `public`, `security definer`, `set search_path = ''`, `revoke execute from public, anon; grant execute to authenticated`). 반환은 아래대로. 잘못된 호출은 한국어 메시지로 `raise exception` (클라이언트 `toMessage()` 가 보여 줌).
 - `poker_open(p_base int default 1, p_max int default 4, p_water int default 8) returns uuid` — 커플의 끝나지 않은 게임이 있으면 그 id 반환(설정 무시). 단 waiting 상태로 12시간 넘었거나 마지막 활동이 12시간 넘은 게임은 ended 로 닫고 새로 만든다. 새로 만들면 호출자를 player 로 넣고, 상대에게 알림(아래).
@@ -41,13 +41,13 @@ RPC (모두 `public`, `security definer`, `set search_path = ''`, `revoke execut
 - `poker_peek(p_round uuid) returns text` — 규칙대로. `peek_left` 감소, `poker_peeks` insert, `peeked_by` 에 추가. 힌트 반환.
 - `poker_use_half(p_round uuid) returns smallint` — 규칙대로. 새 drink_q 반환.
 - `poker_end(p_game uuid) returns void` — `status='ended'`, `ended_at=now()`.
-- 딜(내부 함수 `private.poker_deal(p_game uuid) returns uuid`): 덱에서 2장 pop(부족하면 1..21 을 `order by random()` 으로 재생성), `round_no += 1`, 선 결정, `pot_q = base_q`, hands 2행 insert.
+- 딜(내부 함수 `private.poker_deal(p_game uuid) returns uuid`): 1..21 을 `order by random()` 으로 섞어 2장, `round_no += 1`, 선 결정, `pot_q = base_q`, hands 2행 insert.
 
 알림: 기존 알림 체계(notifications 표 + `private.notify_webhook()` / Edge Function `notify`, migration 10·22·31·32·34 참고)를 읽고 그 방식 그대로, 새 게임을 만들 때 상대에게 kind `'game'` 알림 "🃏 {닉네임}님이 인디언 포커 한 판 하재요" 를 보내고 클릭 시 `/poker` 로 열리게 한다. `notifications.kind` 와 `profiles.notify_off` check 제약에 `'game'` 추가. Edge Function 쪽 수정이 필요하면 코드만 고치고 배포는 하지 않는다(보고).
 
 Realtime: 4개 public 표(`poker_games`, `poker_players`, `poker_rounds`, `poker_hands`)를 `supabase_realtime` publication 에 추가. (`poker_peeks` 는 본인만 쓰니 불필요.)
 
-테스트: `supabase/scripts/` 에 `poker_test.sql` — CLAUDE.md 의 `do $$ ... raise exception 'TEST_RESULT %', r; end $$` 롤백 패턴. 두 사용자 흉내는 `set_config('request.jwt.claims', ..., true)` + `set local role authenticated` 로. 확인 항목: 진행 중 판에서 내 카드 select 0행 / 상대 카드 1행, done 후 둘 다 보임, raise 상한, 차례 아닌 사람 act 거부, fold 2배, call 승패, 조커 승리, peek 힌트 규칙(12/15/20/조커/7), half 계산, 3연패 보너스, 덱 소진 후 재섞기, 다른 커플 접근 거부.
+테스트: `supabase/scripts/` 에 `poker_test.sql` — CLAUDE.md 의 `do $$ ... raise exception 'TEST_RESULT %', r; end $$` 롤백 패턴. 두 사용자 흉내는 `set_config('request.jwt.claims', ..., true)` + `set local role authenticated` 로. 확인 항목: 진행 중 판에서 내 카드 select 0행 / 상대 카드 1행, done 후 둘 다 보임, raise 상한, 차례 아닌 사람 act 거부, fold 2배, call 승패, 조커 승리, peek 힌트 규칙(12/15/20/조커/7), half 계산, 3연패 보너스, 판마다 서로 다른 카드 2장, 다른 커플 접근 거부.
 
 ## 프론트 — `web/src/features/poker/`
 - `queries.ts`: 쿼리 키 `['poker', ...]` 로 모음 (`['poker','game']` 현재 게임+players, `['poker','round', gameId]` 최신 판, `['poker','hands', roundId]`, `['poker','peek', roundId]`). 뮤테이션 = 위 RPC. 성공 후 `['poker']` invalidate.

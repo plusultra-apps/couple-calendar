@@ -4,7 +4,7 @@
 -- 결과는 오류 메시지 "TEST_RESULT ..." 에 줄마다 ok / FAIL 로 나온다. 맨 끝 줄에 FAIL 개수.
 --
 -- 사용자 흉내: set_config('request.jwt.claims', {"sub": ...}, true) + set local role authenticated
--- 카드 고정·덱 조작·확인 조회는 reset role 로 돌아와(postgres) 직접 한다.
+-- 카드 고정·확인 조회는 reset role 로 돌아와(postgres) 직접 한다. (덱은 없다 — 판마다 21장을 새로 섞는다)
 
 do $$
 declare
@@ -75,12 +75,6 @@ begin
     res := res || E'\n' || case when n = 0 and n2 = 1 then 'ok   ' else 'FAIL ' end || 'A: 진행 중 내 카드 0행 / 상대 카드 1행';
 
     begin
-      select count(*) into n from private.poker_decks;
-      res := res || E'\nFAIL 덱 직접 조회 거부 (통과됨)';
-    exception when others then
-      res := res || E'\nok   덱 직접 조회 거부 — ' || sqlerrm;
-    end;
-    begin
       perform private.poker_hint(12);
       res := res || E'\nFAIL 힌트 내부 함수 실행 거부 (통과됨)';
     exception when others then
@@ -99,12 +93,10 @@ begin
       res := res || E'\nok   카드 직접 수정 거부 — ' || sqlerrm;
     end;
 
-    -- 덱: 19장 남고, 덱 + 카드 2장 = 1~21 한 벌
+    -- 첫 딜: 서로 다른 카드 2장 (1~21)
     execute 'reset role';
-    select count(*), count(distinct x) into n, n2 from (
-      select unnest(cards) as x from private.poker_decks where game_id = g
-      union all select card from public.poker_hands where round_id = r1) s;
-    res := res || E'\n' || case when n = 21 and n2 = 21 then 'ok   ' else 'FAIL ' end || '첫 딜: 덱 19 + 카드 2 = 21장 한 벌';
+    select count(*), count(distinct card) into n, n2 from public.poker_hands where round_id = r1 and card between 1 and 21;
+    res := res || E'\n' || case when n = 2 and n2 = 2 then 'ok   ' else 'FAIL ' end || '첫 딜: 서로 다른 카드 2장';
 
     -- ── 1판: 엿보기(조커) · raise 상한 · 차례 · call 조커 승리 ──
     update public.poker_hands set card = 21 where round_id = r1 and user_id = a;
@@ -279,17 +271,14 @@ begin
     select count(*) into n from public.poker_players where game_id = g and user_id = a and drunk_q = 0 and lose_streak = 0 and peek_left = 0 and half_left = 1;
     res := res || E'\n' || case when n = 1 then 'ok   ' else 'FAIL ' end || 'A drunk 0 · 연패 0 · 엿보기 0 · 반잔권 1';
 
-    -- ── 덱 소진: 1장 남음 → 21장 다시 섞기 / 딱 2장 → 그 2장 · 빈 덱 / 빈 덱 → 다시 섞기 ──
+    -- ── 판마다 새로 섞기: 새 판도 서로 다른 카드 2장 (남은 덱 없음) ──
     execute 'reset role';
-    update private.poker_decks set cards = '{7}' where game_id = g;
     perform set_config('request.jwt.claims', json_build_object('sub', a, 'role', 'authenticated')::text, true);
     execute 'set local role authenticated';
     r4 := public.poker_next_round(g);
     execute 'reset role';
-    select count(*), count(distinct x) into n, n2 from (
-      select unnest(cards) as x from private.poker_decks where game_id = g
-      union all select card from public.poker_hands where round_id = r4) s;
-    res := res || E'\n' || case when n = 21 and n2 = 21 then 'ok   ' else 'FAIL ' end || '덱 1장 → 21장 다시 섞음 (' || n || '/' || n2 || ')';
+    select count(*), count(distinct card) into n, n2 from public.poker_hands where round_id = r4 and card between 1 and 21;
+    res := res || E'\n' || case when n = 2 and n2 = 2 then 'ok   ' else 'FAIL ' end || '4판: 새로 섞은 서로 다른 카드 2장';
     update public.poker_hands set card = 1 where round_id = r4 and user_id = b;
     perform set_config('request.jwt.claims', json_build_object('sub', b, 'role', 'authenticated')::text, true);
     execute 'set local role authenticated';
@@ -298,23 +287,19 @@ begin
     res := res || E'\n' || case when q = 1 then 'ok   ' else 'FAIL ' end || 'fold(1) → 기본 벌칙 1';
 
     execute 'reset role';
-    update private.poker_decks set cards = '{8,9}' where game_id = g;
     perform set_config('request.jwt.claims', json_build_object('sub', a, 'role', 'authenticated')::text, true);
     execute 'set local role authenticated';
     r5 := public.poker_next_round(g);
     execute 'reset role';
-    select array_agg(card::text order by card) into hs from public.poker_hands where round_id = r5;
-    select cardinality(cards) into n from private.poker_decks where game_id = g;
-    res := res || E'\n' || case when hs = array['8', '9'] and n = 0 then 'ok   ' else 'FAIL ' end || '덱 2장 → 그 2장 딜 · 덱 0장';
+    update public.poker_hands set card = 8 where round_id = r5 and user_id = a;
+    update public.poker_hands set card = 9 where round_id = r5 and user_id = b;
     perform set_config('request.jwt.claims', json_build_object('sub', a, 'role', 'authenticated')::text, true);
     execute 'set local role authenticated';
     perform public.poker_act(r5, 'fold');   -- 5판 선 = A
     r6 := public.poker_next_round(g);
     execute 'reset role';
-    select count(*), count(distinct x) into n, n2 from (
-      select unnest(cards) as x from private.poker_decks where game_id = g
-      union all select card from public.poker_hands where round_id = r6) s;
-    res := res || E'\n' || case when n = 21 and n2 = 21 then 'ok   ' else 'FAIL ' end || '빈 덱 → 21장 다시 섞음 (' || n || '/' || n2 || ')';
+    select count(*), count(distinct card) into n, n2 from public.poker_hands where round_id = r6 and card between 1 and 21;
+    res := res || E'\n' || case when n = 2 and n2 = 2 then 'ok   ' else 'FAIL ' end || '6판: 새로 섞은 서로 다른 카드 2장';
     select count(*) into n from public.poker_players where game_id = g and user_id = a and drunk_q = 1 and lose_streak = 1;
     res := res || E'\n' || case when n = 1 then 'ok   ' else 'FAIL ' end || 'A fold(8) → drunk 1 · 연패 1';
 

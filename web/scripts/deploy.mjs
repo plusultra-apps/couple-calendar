@@ -37,7 +37,8 @@ run(['deploy', '--prod', '--yes', ...buildEnv])
 //   npm run deploy -- --notes "바뀐 점"  → 그 문구로
 //   npm run deploy -- --quiet           → 보내지 않음 (바로 다시 고친 배포 등)
 const i = process.argv.indexOf('--notes')
-const notes = (i > -1 ? process.argv[i + 1]?.trim() : '') || '자잘한 부분을 다듬었어요'
+// 윈도우에서 npm run 으로 넘기면 cmd 가 괄호·띄어쓰기 앞에 ^ 를 끼워 넣는다 → 지운다 (실제로 "^🃏^ 둘이^ …" 로 나간 적 있음)
+const notes = (i > -1 ? process.argv[i + 1]?.replace(/\^/g, '').trim() : '') || '자잘한 부분을 다듬었어요'
 if (process.argv.includes('--quiet')) {
   console.log('\n(--quiet: 업데이트 알림 보내지 않음)')
 } else {

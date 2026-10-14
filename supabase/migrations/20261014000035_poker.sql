@@ -1,10 +1,10 @@
 -- 몽글 인디언 포커 (커플 둘이 하는 술게임)
--- · 덱 1~20 + 조커(21) = 21장. 판마다 2장을 뽑아 한 장씩 이마에 붙인다. 자기 카드는 못 보고 상대 카드만 본다.
+-- · 덱 1~20 + 조커(21) = 21장. 판마다 21장을 새로 섞어 2장을 뽑아 한 장씩 이마에 붙인다(지난 판 카드로 내 카드를 짐작 못 하게).
+--   자기 카드는 못 보고 상대 카드만 본다.
 -- · 클라이언트는 select 만 직접 한다. 쓰기는 전부 아래 RPC(security definer)로만.
--- · 보안 핵심: 진행 중(betting)인 판의 내 카드(poker_hands) · 덱(private.poker_decks) · 상대의 엿보기 결과(poker_peeks)는
+-- · 보안 핵심: 진행 중(betting)인 판의 내 카드(poker_hands) · 상대의 엿보기 결과(poker_peeks)는
 --   REST select · RPC 반환값 · 실시간 · 오류 메시지 어느 경로로도 새지 않아야 한다.
 --   - poker_hands select 정책: 같은 커플 AND (상대 카드 OR 끝난 판)
---   - 덱은 private 스키마(REST 비노출) + 권한 없음 + RLS on(정책 없음)
 --   - poker_peeks 는 본인만 조회, 실시간 publication 에 넣지 않는다
 --   - RPC 는 카드 값을 돌려주지 않고(엿보기 힌트만 본인에게), 오류 문구에 카드 정보를 담지 않는다
 -- · 동시성: 같은 게임에 대한 쓰기 RPC 는 모두 게임 행을 select ... for update 로 잠가 차례대로 처리한다
@@ -97,14 +97,6 @@ create table public.poker_peeks (
 create index poker_peeks_couple_id_idx on public.poker_peeks (couple_id);
 create index poker_peeks_user_id_idx   on public.poker_peeks (user_id);
 
--- 남은 덱 (다음 카드가 새지 않게 private 스키마 · 권한 없음 · RLS on 정책 없음)
-create table private.poker_decks (
-  game_id  uuid primary key references public.poker_games (id) on delete cascade,
-  cards    smallint[] not null
-);
-alter table private.poker_decks enable row level security;
-revoke all on private.poker_decks from public, anon, authenticated;
-
 -- ─────────────────────────────────────────────
 -- RLS · 권한 (클라이언트는 select 만)
 -- ─────────────────────────────────────────────
@@ -156,7 +148,7 @@ as $$
 $$;
 revoke execute on function private.poker_hint(int) from public, anon, authenticated;
 
--- 새 판 딜: 덱에서 2장 pop(2장 미만이면 21장 전체를 다시 섞음) → round_no += 1 → 선 결정 → 카드 2장.
+-- 새 판 딜: 21장을 새로 섞어 2장 → round_no += 1 → 선 결정 → 카드 2장. (남은 덱을 두지 않는다 — 카드 세기 방지)
 -- 호출하는 RPC 가 게임 행을 이미 잠근 상태여야 한다. 새 판 id 를 돌려준다.
 create function private.poker_deal(p_game uuid)
 returns uuid
@@ -169,10 +161,7 @@ declare
   v_first  uuid;
   v_round  uuid;
 begin
-  select cards into v_cards from private.poker_decks where game_id = p_game for update;
-  if v_cards is null or cardinality(v_cards) < 2 then
-    v_cards := array(select g::smallint from generate_series(1, 21) as g order by random());
-  end if;
+  v_cards := array(select g::smallint from generate_series(1, 21) as g order by random() limit 2);
 
   update public.poker_games set round_no = round_no + 1 where id = p_game
   returning * into v_game;
@@ -198,10 +187,6 @@ begin
   insert into public.poker_hands (round_id, user_id, couple_id, card) values
     (v_round, v_game.created_by, v_game.couple_id, v_cards[1]),
     (v_round, v_other,           v_game.couple_id, v_cards[2]);
-
-  -- 남은 카드 (2장이었으면 빈 배열)
-  insert into private.poker_decks (game_id, cards) values (p_game, v_cards[3:])
-  on conflict (game_id) do update set cards = excluded.cards;
 
   return v_round;
 end
@@ -272,7 +257,7 @@ begin
 end
 $$;
 
--- 참가: 호출자를 참가자로 추가(이미 있으면 무시). 두 명이 되면 playing 으로 바꾸고 덱을 섞어 1판을 딜한다.
+-- 참가: 호출자를 참가자로 추가(이미 있으면 무시). 두 명이 되면 playing 으로 바꾸고 카드를 섞어 1판을 딜한다.
 create function public.poker_join(p_game uuid)
 returns void
 language plpgsql security definer set search_path = ''
