@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>인디언 포커 게임 중</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jua&amp;family=Gowun+Dodum&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#D94C7E}a:hover{color:#B23A64}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; box-sizing: border-box; padding: 16px 16px 24px; display: flex; flex-direction: column; background: radial-gradient(ellipse 120% 60% at 50% 46%, #FFFFFF 0%, #FFF4F8 70%); color: #4B3A4F; font-family: 'Gowun Dodum', 'Apple SD Gothic Neo', sans-serif; overflow: hidden">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; height: 52px">
+    <div style="display: flex; align-items: center; gap: 10px">
+      <div style="position: relative; width: 44px; height: 44px; flex-shrink: 0">
+        <div style="width: 44px; height: 44px; box-sizing: border-box; border-radius: 999px; border: 3px solid #F8B4C4; background: #E9DDE3; overflow: hidden; display: flex; align-items: flex-end; justify-content: center">
+          <svg width="38" height="34" viewBox="0 0 38 34" role="img" aria-label="상대 프로필 사진 자리"><circle cx="19" cy="13" r="8" fill="#BFAAB6"></circle><path d="M3 34 Q3 22 19 22 Q35 22 35 34 Z" fill="#BFAAB6"></path></svg>
+        </div>
+        <svg width="20" height="20" viewBox="30 90 140 120" aria-hidden="true" style="position: absolute; right: -4px; bottom: -3px; border-radius: 999px; background: #FFFFFF; box-shadow: 0 0 0 2px #FFFFFF">
+          <ellipse cx="100" cy="150" rx="72" ry="62" fill="#F8B4C4"></ellipse>
+          <circle cx="74" cy="150" r="9" fill="#4B3A4F"></circle>
+          <circle cx="126" cy="150" r="9" fill="#4B3A4F"></circle>
+        </svg>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 3px">
+        <span style="font-family: Jua, sans-serif; font-size: 17px; line-height: 1">토끼</span>
+        <div style="display: flex; align-items: center; gap: 3px">
+          <sc-for list="{{ oppMeter }}" as="m" hint-placeholder-count="3">
+            <svg width="13" height="15" viewBox="0 0 60 70" aria-hidden="true">
+              <path d="{{ m.d }}" fill="#FF8DB3"></path>
+              <g fill="none" stroke="#4B3A4F" style="stroke-width: 6; stroke-linejoin: round"><path d="M6 4 H54 L48 66 H12 Z"></path></g>
+            </svg>
+          </sc-for>
+          <span style="margin-left: 3px; font-size: 12px; color: #7E6C85">{{ oppText }}</span>
+        </div>
+      </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px">
+      <span style="padding: 6px 12px; border-radius: 999px; background: rgba(75,58,79,0.08); font-family: Jua, sans-serif; font-size: 14px">3라운드</span>
+      <button type="button" aria-label="메뉴" style="width: 44px; height: 44px; border-radius: 999px; border: 0; background: rgba(75,58,79,0.08); display: flex; align-items: center; justify-content: center; padding: 0">
+        <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="#4B3A4F" style="stroke-width: 2.4; stroke-linecap: round"><path d="M5 7 H19"></path><path d="M5 12 H19"></path><path d="M5 17 H19"></path></g></svg>
+      </button>
+    </div>
+  </div>
+
+  <div style="position: relative; display: flex; justify-content: center; height: 262px; margin-top: 4px">
+    <svg width="240" height="262" viewBox="0 0 200 218" role="img" aria-label="상대 토끼, 이마에 14 카드">
+      <ellipse cx="66" cy="70" rx="17" ry="44" fill="#F8B4C4" transform="rotate(-14 66 70)"></ellipse>
+      <ellipse cx="66" cy="72" rx="7" ry="28" fill="#FFFFFF" opacity="0.55" transform="rotate(-14 66 72)"></ellipse>
+      <ellipse cx="134" cy="70" rx="17" ry="44" fill="#F8B4C4" transform="rotate(14 134 70)"></ellipse>
+      <ellipse cx="134" cy="72" rx="7" ry="28" fill="#FFFFFF" opacity="0.55" transform="rotate(14 134 72)"></ellipse>
+      <ellipse cx="100" cy="156" rx="74" ry="60" fill="#F8B4C4"></ellipse>
+      <ellipse cx="72" cy="130" rx="16" ry="8" fill="#FFFFFF" opacity="0.35"></ellipse>
+      <circle cx="72" cy="160" r="6.5" fill="#4B3A4F"></circle>
+      <circle cx="128" cy="160" r="6.5" fill="#4B3A4F"></circle>
+      <circle cx="74" cy="158" r="2" fill="#FFFFFF"></circle>
+      <circle cx="130" cy="158" r="2" fill="#FFFFFF"></circle>
+      <g fill="none" stroke="#4B3A4F" style="stroke-width: 3.5; stroke-linecap: round">
+        <path d="M60 148 L82 151"></path>
+        <path d="M140 148 L118 151"></path>
+        <path d="M92 182 Q104 184 110 176"></path>
+      </g>
+      <ellipse cx="100" cy="172" rx="4" ry="3" fill="#D94C7E"></ellipse>
+      <ellipse cx="56" cy="180" rx="11" ry="6" fill="#FF6F9C" opacity="0.45"></ellipse>
+      <ellipse cx="144" cy="180" rx="11" ry="6" fill="#FF6F9C" opacity="0.45"></ellipse>
+      <g transform="rotate(4 100 88)">
+        <rect x="64" y="40" width="72" height="100" rx="12" fill="#3B2E3F" opacity="0.12" transform="translate(0 4)"></rect>
+        <rect x="64" y="40" width="72" height="100" rx="12" fill="#FFFFFF" stroke="#4B3A4F" style="stroke-width: 3"></rect>
+        <text x="100" y="106" fill="#C23B5E" style="font-family: Jua, sans-serif; font-size: 50px; text-anchor: middle">14</text>
+        <text x="77" y="58" fill="#C23B5E" style="font-family: Jua, sans-serif; font-size: 12px; text-anchor: middle">14</text>
+        <text x="100" y="128" fill="#C23B5E" style="font-family: Jua, sans-serif; font-size: 11px; text-anchor: middle">든든</text>
+      </g>
+    </svg>
+    <div style="position: absolute; right: 8px; top: 30px; padding: 8px 12px; border-radius: 14px 14px 14px 4px; background: #4B3A4F; color: #FFFFFF; font-family: Jua, sans-serif; font-size: 14px">{{ bubble }}</div>
+  </div>
+
+  <div style="position: relative; display: flex; align-items: center; justify-content: center; gap: 18px; height: 150px; margin: 6px -4px 0; border-radius: 999px; background: #FBE1EA; box-shadow: inset 0 0 0 6px #FFF4F8, inset 0 0 0 8px #F6CFDC">
+    <div style="display: flex; gap: 2px">
+      <sc-for list="{{ potGlasses }}" as="g" hint-placeholder-count="1">
+        <svg width="64" height="76" viewBox="0 0 60 70" aria-hidden="true">
+          <path d="M6 4 H54 L48 66 H12 Z" fill="#FFFFFF"></path>
+          <path d="{{ g.d }}" fill="#BFDDF3"></path>
+          <g fill="none" stroke="#4B3A4F" opacity="0.25" style="stroke-width: 1.5">
+            <path d="M12 51.5 H20"></path>
+            <path d="M10.5 37 H18"></path>
+            <path d="M9 22.5 H17"></path>
+          </g>
+          <g fill="none" stroke="#4B3A4F" style="stroke-width: 3; stroke-linejoin: round"><path d="M6 4 H54 L48 66 H12 Z"></path></g>
+        </svg>
+      </sc-for>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <span style="font-size: 12px; font-weight: 700; color: #7E6C85">판돈</span>
+      <span style="font-family: Jua, sans-serif; font-size: 38px; line-height: 1">{{ potText }}</span>
+      <div style="display: flex; gap: 4px">
+        <sc-for list="{{ steps }}" as="s" hint-placeholder-count="4">
+          <span style="{{ s.style }}"></span>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: center; gap: 14px; margin-top: 18px; padding: 0 4px">
+    <div style="position: relative; width: 64px; height: 88px; flex-shrink: 0; transform: rotate(-5deg); border-radius: 12px; background: #FF8DB3; box-shadow: 0 0 0 3px #4B3A4F, 0 6px 0 rgba(59,46,63,0.12); display: flex; align-items: center; justify-content: center">
+      <div style="position: absolute; left: 6px; top: 6px; right: 6px; bottom: 6px; border-radius: 8px; border: 2px dashed rgba(255,255,255,0.7)"></div>
+      <span style="font-family: Jua, sans-serif; font-size: 34px; color: #FFFFFF">?</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0">
+      <span style="font-family: Jua, sans-serif; font-size: 18px; line-height: 1.1">내 카드</span>
+      <span style="font-size: 13px; color: #7E6C85">{{ hint }}</span>
+      <div style="display: flex; align-items: center; gap: 3px">
+        <sc-for list="{{ meMeter }}" as="m" hint-placeholder-count="3">
+          <svg width="13" height="15" viewBox="0 0 60 70" aria-hidden="true">
+            <path d="{{ m.d }}" fill="#A7C7E7"></path>
+            <g fill="none" stroke="#4B3A4F" style="stroke-width: 6; stroke-linejoin: round"><path d="M6 4 H54 L48 66 H12 Z"></path></g>
+          </svg>
+        </sc-for>
+        <span style="margin-left: 3px; font-size: 12px; color: #7E6C85">{{ meText }}</span>
+      </div>
+    </div>
+    <div style="display: flex; gap: 8px">
+      <button type="button" onClick="{{ peek }}" aria-label="엿보기" style="{{ peekStyle }}">
+        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="#2F7A57" style="stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round"><path d="M2 12 C 5 6 9 4 12 4 C 15 4 19 6 22 12 C 19 18 15 20 12 20 C 9 20 5 18 2 12 Z"></path><circle cx="12" cy="12" r="3"></circle></g></svg>
+        <span style="position: absolute; right: -3px; top: -3px; min-width: 18px; height: 18px; border-radius: 999px; background: #4B3A4F; color: #FFFFFF; font-size: 11px; font-weight: 700; line-height: 18px; text-align: center">{{ peekCount }}</span>
+      </button>
+      <button type="button" aria-label="반잔 원샷권" style="position: relative; width: 48px; height: 48px; border-radius: 16px; border: 0; background: #EEE6F8; display: flex; align-items: center; justify-content: center; padding: 0">
+        <svg width="20" height="23" viewBox="0 0 60 70" aria-hidden="true"><path d="M10.5 37 H49.5 L48 66 H12 Z" fill="#C3B1E1"></path><g fill="none" stroke="#4B3A4F" style="stroke-width: 5; stroke-linejoin: round"><path d="M6 4 H54 L48 66 H12 Z"></path></g></svg>
+        <span style="position: absolute; right: -3px; top: -3px; min-width: 18px; height: 18px; border-radius: 999px; background: #4B3A4F; color: #FFFFFF; font-size: 11px; font-weight: 700; line-height: 18px; text-align: center">1</span>
+      </button>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 8px; margin-top: auto">
+    <button type="button" onClick="{{ fold }}" style="flex: 1; height: 68px; border-radius: 20px; border: 0; background: #FFFFFF; box-shadow: 0 0 0 2px #F0D3DD, 0 5px 0 #F0D3DD; color: #4B3A4F; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 0">
+      <span style="font-family: Jua, sans-serif; font-size: 20px; line-height: 1">다이</span>
+      <span style="font-size: 11px; color: #7E6C85">¼잔 마시기</span>
+    </button>
+    <button type="button" onClick="{{ raise }}" style="flex: 1; height: 68px; border-radius: 20px; border: 0; background: #F8B4C4; box-shadow: 0 5px 0 #E68FA5; color: #4B3A4F; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 0">
+      <span style="font-family: Jua, sans-serif; font-size: 20px; line-height: 1">{{ raiseLabel }}</span>
+      <span style="font-size: 11px; color: #6B4A58">{{ raiseSub }}</span>
+    </button>
+    <a href="Result.dc.html" style="flex: 1.35; height: 68px; border-radius: 20px; background: #D94C7E; box-shadow: 0 5px 0 #B23A64; color: #FFFFFF; text-decoration: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px">
+      <span style="font-family: Jua, sans-serif; font-size: 22px; line-height: 1">콜</span>
+      <span style="font-size: 11px; color: #FFE3EC">카드 공개</span>
+    </a>
+  </div>
+
+  <sc-if value="{{ folded }}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; left: 0; top: 0; width: 390px; height: 844px; background: rgba(59,46,63,0.5); display: flex; align-items: flex-end">
+      <div style="width: 100%; box-sizing: border-box; padding: 12px 20px 28px; border-radius: 28px 28px 0 0; background: #FFFFFF; display: flex; flex-direction: column; align-items: center; gap: 10px">
+        <span style="width: 40px; height: 5px; border-radius: 999px; background: #F0D3DD"></span>
+        <svg width="72" height="84" viewBox="0 0 60 70" aria-hidden="true">
+          <path d="M6 4 H54 L48 66 H12 Z" fill="#FFFFFF"></path>
+          <path d="M12 51.5 H48 L48 66 H12 Z" fill="#BFDDF3"></path>
+          <g fill="none" stroke="#D94C7E" style="stroke-width: 2.5"><path d="M2 51.5 H58"></path></g>
+          <g fill="none" stroke="#4B3A4F" style="stroke-width: 3; stroke-linejoin: round"><path d="M6 4 H54 L48 66 H12 Z"></path></g>
+        </svg>
+        <h2 style="margin: 0; font-family: Jua, sans-serif; font-weight: 400; font-size: 26px">다이! ¼잔</h2>
+        <p style="margin: 0; font-size: 14px; color: #7E6C85">빨간 선까지만 따르세요</p>
+        <button type="button" onClick="{{ drink }}" style="width: 100%; height: 56px; margin-top: 6px; border-radius: 18px; border: 0; background: #D94C7E; box-shadow: 0 5px 0 #B23A64; color: #FFFFFF; font-family: Jua, sans-serif; font-size: 22px">마셨어요</button>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    // 단위: 1 = ¼잔
+    this.state = { pot: 2, me: 5, opp: 7, folded: false, step: 0, peeked: false };
+  }
+  glassText(q) {
+    var whole = Math.floor(q / 4);
+    var frac = ['', '¼', '½', '¾'][q % 4];
+    return (whole === 0 ? frac : whole + frac) + '잔';
+  }
+  // 잔 안쪽을 f(0~1)만큼 채우는 사다리꼴
+  fillPath(f) {
+    if (f <= 0) return '';
+    var y = 66 - 58 * f;
+    var xl = 6 + (y - 4) * 6 / 62;
+    var xr = 54 - (y - 4) * 6 / 62;
+    return 'M' + xl.toFixed(1) + ' ' + y.toFixed(1) + ' L' + xr.toFixed(1) + ' ' + y.toFixed(1) + ' L48 66 L12 66 Z';
+  }
+  meter(q) {
+    var out = [];
+    for (var i = 0; i < 3; i++) out.push({ d: this.fillPath(Math.max(0, Math.min(4, q - i * 4)) / 4) });
+    return out;
+  }
+  renderVals() {
+    var self = this;
+    var s = this.state;
+    var max = 4;
+    var bubbles = ['레이즈! +¼잔', '흐음… 진짜?', '떨리지? 히히', '자신 있는데?', '…'];
+    var potGlasses = [];
+    var count = Math.max(1, Math.ceil(s.pot / 4));
+    for (var i = 0; i < count; i++) potGlasses.push({ d: this.fillPath(Math.min(4, s.pot - i * 4) / 4) });
+    var steps = [];
+    for (var j = 1; j <= max; j++) {
+      steps.push({ style: 'display: block; width: 14px; height: 6px; border-radius: 3px; background: ' + (j <= s.pot ? '#D94C7E' : '#F0C4D3') + ';' });
+    }
+    var item = 'position: relative; width: 48px; height: 48px; border-radius: 16px; border: 0; display: flex; align-items: center; justify-content: center; padding: 0; ';
+    return {
+      potText: this.glassText(s.pot),
+      potGlasses: potGlasses,
+      steps: steps,
+      bubble: bubbles[s.step % bubbles.length],
+      folded: s.folded,
+      oppMeter: this.meter(s.opp),
+      meMeter: this.meter(s.me),
+      oppText: this.glassText(s.opp),
+      meText: this.glassText(s.me),
+      hint: s.peeked ? '10보다 커요!' : '토끼 표정을 잘 봐',
+      peekCount: s.peeked ? 0 : 1,
+      peekStyle: s.peeked ? item + 'background: #F3F0F4; opacity: 0.5;' : item + 'background: #E4F6EC;',
+      peek: function () { self.setState({ peeked: true }); },
+      raiseLabel: s.pot >= max ? '최대' : '레이즈',
+      raiseSub: s.pot >= max ? '더는 못 올려요' : '+¼잔',
+      raise: function () {
+        if (s.pot >= max) return;
+        self.setState({ pot: s.pot + 1, step: s.step + 1 });
+      },
+      fold: function () { self.setState({ folded: true }); },
+      drink: function () {
+        self.setState({ folded: false, me: Math.min(12, s.me + 1), pot: 2, step: 0 });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

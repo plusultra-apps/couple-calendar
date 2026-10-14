@@ -1,0 +1,224 @@
+@import "tailwindcss";
+
+/* 몽글몽글 파스텔 테마 — 둥근 글꼴, 입체 버튼, 통통 튀는 움직임 */
+@theme {
+  --color-me: #A7C7E7;
+  --color-partner: #F8B4C4;
+  --color-us: #C3B1E1;
+  --color-busy: #D9D9D9;
+  --color-anniv: #FFD59E;
+  --color-free: #B5E8CB;
+  --color-free-deep: #4FB383;
+  --color-holiday: #F26D8A;
+  --color-sat: #5E93D1;
+
+  --color-bg: #FFF4F8;
+  --color-cream: #FFF9F0;
+  --color-surface: #FFFFFF;
+  --color-ink: #4B3A4F;
+  --color-ink-soft: #A08FA6;
+  --color-line: #F6DDE7;
+  --color-line-deep: #EDC6D6;
+  --color-accent: #FF8DB3;
+  --color-accent-deep: #E9608F;
+
+  /* 인디언 포커 (features/poker): 소주·볼터치·카드 등급(5장마다 색이 바뀜) */
+  --color-soju: #BFDDF3;
+  --color-blush: #FF6F9C;
+  --color-pour-line: #D94C7E;
+  --color-card-weak: #2F7A57;
+  --color-card-meh: #3F7DB8;
+  --color-card-good: #C23B5E;
+  --color-card-king: #8A5C0E;
+  --color-card-king-bg: #FFF3DC;
+  --color-card-joker: #5B3F8C;
+  --color-card-joker-bg: #EEE6F8;
+  --color-crown: #F2B84B;
+
+  --font-sans: "NanumSquareRound", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --font-display: "Jua", "NanumSquareRound", "Apple SD Gothic Neo", sans-serif;
+
+  --animate-pop: pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --animate-float: float 3s ease-in-out infinite;
+  --animate-wiggle: wiggle 0.5s ease-in-out;
+  --animate-heartbeat: heartbeat 1.6s ease-in-out infinite;
+}
+
+/* 테마 (설정 → 테마, app/theme.ts). 기본은 위의 딸기우유.
+   partner 는 UI 강조색(탭·선택 표시)으로도 쓰여서 테마마다 같이 바꾼다. 사람 색은 profiles.color 라 그대로. */
+:root[data-theme='sky'] {
+  --color-partner: #B5D3F0;
+  --color-bg: #F1F6FC;
+  --color-ink: #34404F;
+  --color-ink-soft: #8494A8;
+  --color-line: #DCE8F5;
+  --color-line-deep: #C3D7EC;
+  --color-accent: #5B9BD5;
+  --color-accent-deep: #3F7DB8;
+}
+:root[data-theme='mint'] {
+  --color-partner: #A8DCC0;
+  --color-bg: #F0F8F4;
+  --color-ink: #2F4A40;
+  --color-ink-soft: #7F9A8E;
+  --color-line: #D8EDE1;
+  --color-line-deep: #BFE0CD;
+  --color-accent: #4DB38A;
+  --color-accent-deep: #2F9470;
+}
+:root[data-theme='mocha'] {
+  --color-partner: #E3D3BF;
+  --color-bg: #F7F4EF;
+  --color-ink: #3F362F;
+  --color-ink-soft: #9A8E82;
+  --color-line: #EAE2D6;
+  --color-line-deep: #DACDBB;
+  --color-accent: #B08968;
+  --color-accent-deep: #8E6A4B;
+}
+:root[data-theme='simple'] {
+  --color-partner: #CDD3DC;
+  --color-bg: #F5F6F8;
+  --color-ink: #2E333B;
+  --color-ink-soft: #8A919C;
+  --color-line: #E3E6EB;
+  --color-line-deep: #CDD2DA;
+  --color-accent: #5C6B80;
+  --color-accent-deep: #435064;
+}
+
+@keyframes pop {
+  0% { transform: scale(0.6); opacity: 0; }
+  70% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-8deg); }
+  75% { transform: rotate(8deg); }
+}
+@keyframes heartbeat {
+  0%, 60%, 100% { transform: scale(1); }
+  20% { transform: scale(1.18); }
+  40% { transform: scale(0.96); }
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  /* 은은한 물방울 무늬 */
+  background-color: var(--color-bg);
+  background-image: radial-gradient(color-mix(in srgb, var(--color-partner) 22%, transparent) 1.5px, transparent 1.6px);
+  background-size: 22px 22px;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  overscroll-behavior-y: none;
+}
+
+/* 제목·숫자용 둥근 글꼴. 주아체는 굵기가 하나라 가짜 굵게를 막는다 */
+h1,
+h2,
+h3,
+.font-display {
+  font-family: var(--font-display);
+  font-synthesis: none;
+  letter-spacing: 0.01em;
+}
+
+/* iOS 에서 date/time 입력이 가운데 정렬되고 높이가 줄어드는 문제 */
+input[type="date"],
+input[type="time"] {
+  -webkit-appearance: none;
+  appearance: none;
+  text-align: left;
+}
+input[type="date"]::-webkit-date-and-time-value,
+input[type="time"]::-webkit-date-and-time-value {
+  text-align: left;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* 누르면 쏙 들어가는 입체 효과 (듀오링고 스타일) */
+.press-3d {
+  box-shadow: 0 5px 0 var(--shade, var(--color-line-deep));
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+.press-3d:active:not(:disabled) {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 var(--shade, var(--color-line-deep));
+}
+
+/* 카카오 지도 위 사진 핀 (components/KakaoMap) */
+.ourcal-pin {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: none;
+  border: 0;
+  padding: 0;
+  transform-origin: bottom center;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.ourcal-pin.is-active {
+  transform: scale(1.18);
+}
+.ourcal-pin__bubble {
+  position: relative;
+  display: flex;
+  width: 52px;
+  height: 52px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 3px solid #fff;
+  border-radius: 9999px;
+  background: var(--color-partner);
+  font-size: 26px;
+  box-shadow: 0 3px 0 var(--color-accent-deep), 0 6px 14px rgb(75 58 79 / 0.25);
+}
+.ourcal-pin.is-active .ourcal-pin__bubble {
+  border-color: var(--color-accent);
+}
+.ourcal-pin__bubble img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.ourcal-pin__label {
+  max-width: 110px;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: #fff;
+  padding: 2px 8px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  color: var(--color-ink);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  box-shadow: 0 2px 6px rgb(75 58 79 / 0.2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

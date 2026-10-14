@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+  <!-- 안드로이드 알림 왼쪽 위 작은 아이콘: 모양(투명도)만 쓰이므로 흰색 한 가지로 그린다 -->
+  <rect x="31" y="10" width="8" height="18" rx="4" fill="#fff"/>
+  <rect x="57" y="10" width="8" height="18" rx="4" fill="#fff"/>
+  <path fill="#fff" fill-rule="evenodd" d="M24 20h48a12 12 0 0 1 12 12v42a12 12 0 0 1-12 12H24a12 12 0 0 1-12-12V32a12 12 0 0 1 12-12zm-4 20v34a4 4 0 0 0 4 4h48a4 4 0 0 0 4-4V40z"/>
+  <path fill="#fff" d="M48 72c-2 0-16-9-16-20 0-6 4-10 9-10 3 0 5 1.5 7 4 2-2.5 4-4 7-4 5 0 9 4 9 10 0 11-14 20-16 20z"/>
+</svg>

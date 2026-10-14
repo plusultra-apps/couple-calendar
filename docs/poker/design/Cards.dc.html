@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>인디언 포커 카드 덱</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jua&amp;family=Gowun+Dodum&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#D94C7E}a:hover{color:#B23A64}
+</style>
+</helmet>
+<div style="width: 984px; height: 600px; box-sizing: border-box; padding: 32px 36px; display: flex; flex-direction: column; gap: 20px; background-color: #FFF4F8; background-image: radial-gradient(rgba(248,180,196,0.35) 1.5px, transparent 1.6px); background-size: 22px 22px; color: #4B3A4F; font-family: 'Gowun Dodum', 'Apple SD Gothic Neo', sans-serif">
+  <div style="display: flex; align-items: baseline; gap: 14px">
+    <h1 style="margin: 0; font-family: Jua, sans-serif; font-weight: 400; font-size: 30px">카드 덱</h1>
+    <p style="margin: 0; font-size: 14px; color: #7E6C85">1~20 한 벌 + 조커 1장 · 모든 카드가 달라서 무승부 없음 · 5장마다 색이 바뀌어요</p>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 18px 16px">
+    <sc-for list="{{ cards }}" as="c" hint-placeholder-count="20">
+      <div style="{{ c.box }}">
+        <span style="{{ c.corner }}">{{ c.n }}</span>
+        <div style="display: flex; flex-direction: column; align-items: center; margin: auto 0">
+          <sc-if value="{{ c.king }}" hint-placeholder-val="{{ false }}">
+            <svg width="30" height="20" viewBox="0 0 34 24" aria-hidden="true"><g fill="#F2B84B" stroke="#8A5C0E" style="stroke-width: 2; stroke-linejoin: round"><path d="M3 20 L5 6 L12 13 L17 3 L22 13 L29 6 L31 20 Z"></path></g></svg>
+          </sc-if>
+          <span style="{{ c.big }}">{{ c.n }}</span>
+        </div>
+        <span style="{{ c.name }}">{{ c.label }}</span>
+      </div>
+    </sc-for>
+
+    <div style="height: 140px; box-sizing: border-box; padding: 8px 8px 10px; border-radius: 14px; border: 3px solid #4B3A4F; background: #EEE6F8; box-shadow: 0 5px 0 #D9CCEB; display: flex; flex-direction: column; align-items: center">
+      <span style="align-self: flex-start; font-family: Jua, sans-serif; font-size: 16px; line-height: 1; color: #5B3F8C">J</span>
+      <svg width="44" height="44" viewBox="0 0 24 24" aria-hidden="true" style="margin: auto 0"><g fill="#C3B1E1" stroke="#5B3F8C" style="stroke-width: 1.6; stroke-linejoin: round"><path d="M12 2 L14.8 8.6 L22 9.3 L16.6 14 L18.2 21 L12 17.3 L5.8 21 L7.4 14 L2 9.3 L9.2 8.6 Z"></path></g></svg>
+      <span style="font-family: Jua, sans-serif; font-size: 15px; color: #5B3F8C">조커</span>
+    </div>
+
+    <div style="height: 140px; box-sizing: border-box; border-radius: 14px; border: 3px solid #4B3A4F; background: #FF8DB3; box-shadow: 0 5px 0 #EDC6D6; display: flex; align-items: center; justify-content: center; position: relative">
+      <div style="position: absolute; left: 7px; top: 7px; right: 7px; bottom: 7px; border-radius: 9px; border: 2px dashed rgba(255,255,255,0.75)"></div>
+      <svg width="40" height="36" viewBox="-10 -11 20 18" aria-hidden="true"><path d="M0 6 C -6 1 -9 -2 -9 -5 C -9 -8 -6.5 -10 -4 -10 C -2 -10 -0.8 -9 0 -7.6 C 0.8 -9 2 -10 4 -10 C 6.5 -10 9 -8 9 -5 C 9 -2 6 1 0 6 Z" fill="#FFFFFF"></path></svg>
+    </div>
+
+    <div style="height: 140px; box-sizing: border-box; padding: 10px; border-radius: 14px; border: 2px dashed #B5E8CB; background: #FFFFFF; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-align: center">
+      <svg width="34" height="34" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="#2F7A57" style="stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M2 12 C 5 6 9 4 12 4 C 15 4 19 6 22 12 C 19 18 15 20 12 20 C 9 20 5 18 2 12 Z"></path><circle cx="12" cy="12" r="3"></circle></g></svg>
+      <span style="font-family: Jua, sans-serif; font-size: 15px">엿보기</span>
+      <span style="font-size: 11px; line-height: 1.4; color: #7E6C85">내 카드가 10보다 큰지 확인 · 1회</span>
+    </div>
+
+    <div style="height: 140px; box-sizing: border-box; padding: 10px; border-radius: 14px; border: 2px dashed #D9CCEB; background: #FFFFFF; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-align: center">
+      <svg width="30" height="35" viewBox="0 0 60 70" aria-hidden="true"><path d="M10.5 37 H49.5 L48 66 H12 Z" fill="#C3B1E1"></path><g fill="none" stroke="#4B3A4F" style="stroke-width: 4; stroke-linejoin: round"><path d="M6 4 H54 L48 66 H12 Z"></path></g></svg>
+      <span style="font-family: Jua, sans-serif; font-size: 15px">반잔 원샷권</span>
+      <span style="font-size: 11px; line-height: 1.4; color: #7E6C85">이번 판 벌칙 절반 · 1장</span>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":984,"height":600}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var tiers = ['쫄보', '애매', '든든', '왕'];
+    var cards = [];
+    for (var n = 1; n <= 20; n++) {
+      var t = Math.floor((n - 1) / 5);
+      var ink = ['#2F7A57', '#3F7DB8', '#C23B5E', '#8A5C0E'][t];
+      var bg = t === 3 ? '#FFF3DC' : '#FFFFFF';
+      var edge = t === 3 ? '#8A5C0E' : '#4B3A4F';
+      cards.push({
+        n: n,
+        label: tiers[t],
+        king: n === 20,
+        box: 'height: 140px; box-sizing: border-box; padding: 8px 8px 10px; border-radius: 14px; border: 3px solid ' + edge + '; background: ' + bg + '; box-shadow: 0 5px 0 #EDC6D6; display: flex; flex-direction: column; align-items: center;',
+        corner: 'align-self: flex-start; font-family: Jua, sans-serif; font-size: 16px; line-height: 1; color: ' + ink + ';',
+        big: 'font-family: Jua, sans-serif; font-size: 44px; line-height: 1; color: ' + ink + ';',
+        name: 'font-family: Jua, sans-serif; font-size: 14px; color: ' + ink + ';'
+      });
+    }
+    return { cards: cards };
+  }
+}
+</script>
+</body>
+</html>
