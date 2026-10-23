@@ -301,7 +301,8 @@ function Editor({ event, userId }: { event: EventWithSecret | null; userId: stri
 
           <div className="flex flex-col gap-1.5">
             <span className="px-1 text-sm font-bold text-ink-soft">{d.allDay ? '며칠 동안?' : '얼마나?'}</span>
-            <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none]">
+            {/* 5개가 좁은 폰에서 잘리지 않도록 가로 스크롤 대신 줄바꿈 */}
+            <div className="flex flex-wrap gap-2">
               {(d.allDay ? DAY_SPANS : DURATIONS).map((opt) => {
                 const active = d.allDay
                   ? diffDays(d.endDate, d.startDate) === opt.value
