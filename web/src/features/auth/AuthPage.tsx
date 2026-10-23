@@ -48,7 +48,7 @@ export function AuthPage() {
     <main className="mx-auto flex min-h-full max-w-md flex-col justify-center gap-6 px-5 py-10">
       <header className="flex flex-col items-center gap-1">
         <Mascot size={180} />
-        <h1 className="text-4xl text-accent-deep">우리달력</h1>
+        <h1 className="text-4xl text-accent-deep">러브로그</h1>
         <p className="font-display text-ink-soft">둘의 시간을 한눈에</p>
       </header>
 

@@ -33,7 +33,7 @@ export function FeedSettings() {
     <Card className="flex flex-col gap-3">
       <h2 className="text-lg font-bold">휴대폰 기본 캘린더에 표시</h2>
       <p className="text-sm text-ink-soft">
-        아래 주소를 구독하면 우리달력 일정과 기념일이 휴대폰 기본 캘린더(위젯 포함)에 보여요. 읽기 전용이에요.
+        아래 주소를 구독하면 러브로그 일정과 기념일이 휴대폰 기본 캘린더(위젯 포함)에 보여요. 읽기 전용이에요.
       </p>
 
       {token.isPending ? (

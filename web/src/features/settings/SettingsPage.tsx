@@ -390,10 +390,10 @@ function InviteCode({ code }: { code: string }) {
 
   async function share() {
     setError('')
-    const text = `우리달력에서 같이 일정 관리해요\n초대 코드: ${code}\n${window.location.origin}`
+    const text = `러브로그에서 같이 일정 관리해요\n초대 코드: ${code}\n${window.location.origin}`
     if (navigator.share) {
       try {
-        await navigator.share({ title: '우리달력 초대', text })
+        await navigator.share({ title: '러브로그 초대', text })
         return
       } catch (err) {
         if ((err as Error)?.name === 'AbortError') return
@@ -576,7 +576,7 @@ function LogoutSection() {
       </Button>
       <footer className="flex flex-col items-center gap-1 pt-2 pb-4 text-xs text-ink-soft">
         <img src="/icon.svg" alt="" className="h-8 w-8 opacity-80" />
-        <span>우리달력 v{APP_VERSION}</span>
+        <span>러브로그 v{APP_VERSION}</span>
         <span>둘의 시간을 한눈에</span>
       </footer>
     </>

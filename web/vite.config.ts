@@ -16,14 +16,14 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icon.svg', 'apple-touch-icon-180x180.png', 'badge-96x96.png'],
       manifest: {
-        name: '우리달력',
-        short_name: '우리달력',
+        name: '러브로그',
+        short_name: '러브로그',
         description: '둘의 시간을 한눈에 — 커플 공유 캘린더',
         lang: 'ko',
         start_url: '/',
         display: 'standalone',
         orientation: 'portrait',
-        // 다른 앱의 '공유' 목록에 우리달력이 뜬다 (안드로이드). 받은 내용은 위시로 담는다.
+        // 다른 앱의 '공유' 목록에 러브로그가 뜬다 (안드로이드). 받은 내용은 위시로 담는다.
         share_target: {
           action: '/share',
           method: 'GET',

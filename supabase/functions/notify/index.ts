@@ -193,7 +193,7 @@ Deno.serve(async (req) => {
       if (!text) return json({ error: 'bad_request' }, 400)
       const { data: people, error } = await admin.from('profiles').select('id').not('couple_id', 'is', null)
       if (error) throw error
-      const msg: Message = { title: '🆕 우리달력이 업데이트됐어요', body: `${text} · 앱을 열면 새 버전으로 바뀌어요`, tag: 'app-update', url: '/' }
+      const msg: Message = { title: '🆕 러브로그가 업데이트됐어요', body: `${text} · 앱을 열면 새 버전으로 바뀌어요`, tag: 'app-update', url: '/' }
       const results = await Promise.all((people ?? []).map((p) => deliver(p.id, 'update', msg)))
       return json({ total: results.length, sent: results.filter((r) => r === 'sent').length })
     }

@@ -1,11 +1,11 @@
-# 우리달력 (couple-calendar)
+# 러브로그 (couple-calendar)
 
 > 둘의 시간을 한눈에. 계획은 같이, 기념일은 자동으로.
 
 커플 두 사람이 일정·기념일·추억 사진·위시리스트를 함께 보는 **공유 캘린더 PWA**입니다.
 갤럭시와 아이폰을 쓰는 둘이 홈 화면에 추가해 앱처럼 사용합니다.
 
-![우리달력 화면 미리보기](docs/screenshots/overview.png)
+![러브로그 화면 미리보기](docs/screenshots/overview.png)
 
 ## 프로젝트 정보
 

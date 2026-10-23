@@ -15,7 +15,7 @@ export function makeSteps(n: { me: string; partner: string; meAvatar: string; pa
   return [
     // ── 시작 ──
     {
-      title: '우리달력에 온 걸 환영해요!',
+      title: '러브로그에 온 걸 환영해요!',
       body: `지금부터 하나씩 직접 눌러 보면서 사용법을 알려 드릴게요.\n\n여기 나오는 일정·사진은 전부 연습용이라 실제로 저장되지 않고, ${n.partner}에게 알림도 가지 않아요. 마음껏 눌러 보세요.`,
       action: 'next',
       cta: '시작하기',
@@ -243,7 +243,7 @@ export function makeSteps(n: { me: string; partner: string; meAvatar: string; pa
     {
       section: '위시',
       title: '위시에서 바로 약속 잡기',
-      body: "위시 카드의 '날짜 잡기'를 누르면 이 장소로 일정이 바로 만들어져요.\n\n💡 안드로이드는 카카오맵 앱에서 장소 → 공유 → 우리달력을 고르면 바로 위시에 담겨요.",
+      body: "위시 카드의 '날짜 잡기'를 누르면 이 장소로 일정이 바로 만들어져요.\n\n💡 안드로이드는 카카오맵 앱에서 장소 → 공유 → 러브로그를 고르면 바로 위시에 담겨요.",
       target: 'wish-plan',
       action: 'next',
     },
@@ -370,7 +370,7 @@ export function makeSteps(n: { me: string; partner: string; meAvatar: string; pa
       title: '준비 끝! 🎉',
       body: `이제 ${josa(n.partner, '과', '와')} 진짜 일정을 채워 볼까요?\n연습으로 만든 일정·위시·사진은 사라지고, 실제 달력으로 돌아가요.`,
       action: 'next',
-      cta: '우리달력 시작하기',
+      cta: '러브로그 시작하기',
     },
   ]
 }

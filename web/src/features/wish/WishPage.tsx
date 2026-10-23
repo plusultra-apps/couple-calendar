@@ -536,7 +536,7 @@ function WishForm({
         />
         {pasteNote && <p className="px-1 text-xs text-ink-soft">{pasteNote}</p>}
         <p className="px-1 text-[11px] text-ink-soft">
-          갤럭시는 카카오맵에서 <b>공유 → 우리달력</b>을 누르면 바로 담겨요
+          갤럭시는 카카오맵에서 <b>공유 → 러브로그</b>을 누르면 바로 담겨요
         </p>
       </div>
 

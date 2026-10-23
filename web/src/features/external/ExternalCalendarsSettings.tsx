@@ -159,7 +159,7 @@ function AddSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
           <p>
             <b className="text-ink">아웃룩</b> · 설정 → 일정 → 공유 일정 → 일정 게시 → ICS 링크 복사
           </p>
-          <p className="text-xs">주소는 비밀번호처럼 다뤄 주세요. 우리달력은 시간 정보만 저장해요.</p>
+          <p className="text-xs">주소는 비밀번호처럼 다뤄 주세요. 러브로그는 시간 정보만 저장해요.</p>
         </div>
         <button type="submit" className="hidden" />
       </form>

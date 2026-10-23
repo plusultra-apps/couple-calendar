@@ -8,7 +8,7 @@ import { usePush, type PushStatus } from './usePush'
 const HINT: Partial<Record<PushStatus, string>> = {
   unsupported: '이 브라우저는 알림을 지원하지 않아요. 크롬이나 사파리 최신 버전에서 사용해 주세요.',
   'needs-install': '아이폰은 홈 화면에 추가한 앱에서만 알림을 받을 수 있어요. 사파리 공유 버튼 → "홈 화면에 추가" 후 그 앱에서 켜 주세요.',
-  denied: '알림 권한이 거부되어 있어요. 휴대폰 설정 → 앱(또는 브라우저) → 알림에서 우리달력 알림을 허용한 뒤 다시 시도해 주세요.',
+  denied: '알림 권한이 거부되어 있어요. 휴대폰 설정 → 앱(또는 브라우저) → 알림에서 러브로그 알림을 허용한 뒤 다시 시도해 주세요.',
 }
 
 // 설정 > 알림

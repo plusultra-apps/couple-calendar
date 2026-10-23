@@ -55,7 +55,7 @@ export function InstallIntro() {
         <div className="flex flex-col items-center text-center">
           <Mascot size={150} />
           <h1 className="mt-3 text-[26px] leading-tight">
-            우리달력은
+            러브로그는
             <br />
             <span className="text-accent-deep">휴대폰 앱</span>으로 써 주세요
           </h1>
@@ -126,7 +126,7 @@ function AndroidSteps() {
       <Step n={2} icon={<PlusSquare className="h-6 w-6" />} title="‘홈 화면에 추가’ 또는 ‘앱 설치’">
         삼성 인터넷은 ‘현재 페이지 추가 → 홈 화면’이에요.
       </Step>
-      <Step n={3} icon={<img src="/icon.svg" alt="" className="h-7 w-7 rounded-lg" />} title="홈 화면의 우리달력 아이콘으로 열어요" />
+      <Step n={3} icon={<img src="/icon.svg" alt="" className="h-7 w-7 rounded-lg" />} title="홈 화면의 러브로그 아이콘으로 열어요" />
     </>
   )
 }
@@ -176,7 +176,7 @@ function DesktopQr() {
       <p className="font-display flex items-center gap-1.5 text-lg">
         <Smartphone className="h-5 w-5 text-accent" /> 휴대폰 카메라로 찍어 주세요
       </p>
-      {src ? <img src={src} alt="우리달력 주소 QR 코드" className="h-56 w-56 rounded-2xl" /> : <div className="h-56 w-56 rounded-2xl bg-line/50" />}
+      {src ? <img src={src} alt="러브로그 주소 QR 코드" className="h-56 w-56 rounded-2xl" /> : <div className="h-56 w-56 rounded-2xl bg-line/50" />}
       <p className="text-sm break-all text-ink-soft">{location.origin}</p>
       <p className="text-center text-xs text-ink-soft">
         갤럭시는 크롬·삼성 인터넷, 아이폰은 사파리로 열고

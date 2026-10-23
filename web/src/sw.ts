@@ -27,7 +27,7 @@ self.addEventListener('push', (event) => {
   }
   event.waitUntil(
     Promise.all([
-      self.registration.showNotification(p.title || '우리달력', {
+      self.registration.showNotification(p.title || '러브로그', {
         body: p.body ?? '',
         icon: '/pwa-192x192.png',
         // 안드로이드 상단 작은 아이콘은 모양(투명도)만 쓴다 → 흰색 달력 실루엣 (컬러 아이콘이면 네모·동그라미로 보임)

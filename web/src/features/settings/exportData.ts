@@ -18,7 +18,7 @@ export async function downloadBackup() {
   }
 
   const backup = {
-    app: '우리달력',
+    app: '러브로그',
     format: 1,
     exported_at: new Date().toISOString(),
     couples: couples.data,

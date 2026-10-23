@@ -25,7 +25,7 @@ export function IosInstallSteps() {
       <Step
         n={3}
         icon={<img src="/icon.svg" alt="" className="h-7 w-7 rounded-lg" />}
-        title="홈 화면의 우리달력 아이콘으로 열어요"
+        title="홈 화면의 러브로그 아이콘으로 열어요"
       >
         앱처럼 전체 화면으로 열리고, 알림도 받을 수 있어요 (iOS 16.4 이상).
       </Step>

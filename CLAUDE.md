@@ -1,7 +1,13 @@
-# 우리달력 — 작업 규칙
+# 러브로그 — 작업 규칙
 
 커플 둘(갤럭시 + 아이폰)이 쓰는 공유 캘린더 PWA. 기획·진행 현황은 [PLAN.md](PLAN.md).
 UI 문구와 코드 주석은 **한국어**, 식별자는 영어.
+
+**앱 이름은 "러브로그"** (2026-10-23 에 "우리달력"에서 변경). 화면·알림·설치 이름·문서의 한글 이름만 바꿨고, 아래 영문 식별자는 **일부러 `ourcal` 그대로 둔다** — 바꾸면 설치된 앱의 로그인·설정이 초기화되거나 일정이 중복된다.
+- 주소 `ourcal-tau.vercel.app`, Vercel 프로젝트 `ourcal` (주소가 바뀌면 폰이 새 앱으로 인식 → 로그인·알림 구독 초기화)
+- localStorage 키 `ourcal.*`, CSS 클래스 `ourcal-pin`, ICS 일정 UID `@ourcal`
+- GitHub 저장소는 `plusultra-apps/couple-calendar`
+- 아이폰은 홈 화면에 추가할 때 이름이 고정된다 → 이름을 바꾸면 아이콘을 지우고 다시 추가해야 한다. 안드로이드(크롬)는 보통 알아서 갱신.
 
 ## 구조
 ```
@@ -81,5 +87,5 @@ supabase/functions/<이름>/  Edge Functions (Deno)
 - 라우트 단위 화면은 `React.lazy` 로 분할한다(번들 크기).
 - 설치 안내: `features/install/InstallIntro` 가 브라우저로 처음 열면 화면 가득 안내(안드로이드 설치 버튼·메뉴 안내 / 아이폰 사파리 단계 / 카톡 등 앱 안 브라우저는 외부 브라우저로 / PC 는 QR). "웹에서 둘러볼게요"는 3일 숨김. 작은 배너 `InstallPrompt` 는 탭 화면 맨 위(아래 버튼에 가리지 않게).
 - 튜토리얼 `features/tutorial/`: `/tutorial` 전체 화면 연습 모드. 커플 연결 후 처음 `/` 로 오면 자동(휴대폰마다 localStorage `ourcal.tutorial.done`), 설정 → 사용법 / 캘린더 ? 버튼으로 다시. **실제 데이터를 쓰지 않는다**: 가짜 데이터(`demoData.ts`)와 순수 컴포넌트(MonthGrid·ItemRow·DayFreeTime `onPlan`)만 쓰고 쿼리·뮤테이션 훅 금지. 단계는 `steps.ts`(target = `data-tut`, 달력 날짜는 `day:YYYY-MM-DD` → `data-day`), `Coach.tsx` 가 어둡게 덮고 대상만 누를 수 있게 한다. 새 기능을 만들면 튜토리얼 단계도 추가한다.
-- 업데이트 소식 알림: 배포가 성공하면 **매번** `scripts/deploy.mjs` 가 notify 함수(`x-release-secret` = `.env.local RELEASE_SECRET` = `app_config.release_secret`)로 커플이 있는 모든 사용자에게 "🆕 우리달력이 업데이트됐어요" (종류 `update`, 각자 설정·조용한 시간 따름). 문구는 `npm run deploy -- --notes "바뀐 점"`(없으면 "자잘한 부분을 다듬었어요"), 보내지 않으려면 `-- --quiet`. 배포 때는 바뀐 점을 짧게 `--notes` 로 쓴다.
+- 업데이트 소식 알림: 배포가 성공하면 **매번** `scripts/deploy.mjs` 가 notify 함수(`x-release-secret` = `.env.local RELEASE_SECRET` = `app_config.release_secret`)로 커플이 있는 모든 사용자에게 "🆕 러브로그가 업데이트됐어요" (종류 `update`, 각자 설정·조용한 시간 따름). 문구는 `npm run deploy -- --notes "바뀐 점"`(없으면 "자잘한 부분을 다듬었어요"), 보내지 않으려면 `-- --quiet`. 배포 때는 바뀐 점을 짧게 `--notes` 로 쓴다.
 - 업데이트: `npm run deploy` 만 하면 된다. SW 는 skipWaiting+clientsClaim, `app/pwaUpdate.ts` 가 앱으로 돌아올 때마다 새 버전을 확인하고 바뀌면 자동 새로고침(일정 편집 화면이면 나갈 때까지 미룸). DB 변경은 배포 전에 적용하고, 옛 화면도 잠깐 동작하도록 칸 삭제·이름 변경은 피한다.

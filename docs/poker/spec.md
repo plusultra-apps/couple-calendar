@@ -1,6 +1,6 @@
 # 몽글 인디언 포커 — 개발 설계서 (agent 공용 계약)
 
-프로젝트: `C:\Users\KUP\Desktop\applications\calander-1` (우리달력 PWA). 먼저 `CLAUDE.md` 를 읽고 규칙을 지킨다.
+프로젝트: `C:\Users\KUP\Desktop\applications\calander-1` (러브로그 PWA). 먼저 `CLAUDE.md` 를 읽고 규칙을 지킨다.
 디자인 시안(확정): `docs/poker/design/` 의 (캔버스 원본: https://claude.ai/artifact/1zWkUfQ5dTz9X1bqn3kwqu) `Main.dc.html`(로비), `Game.dc.html`(게임), `Result.dc.html`(결과), `Cards.dc.html`(카드 덱). 색은 시안의 hex 대신 앱 테마 토큰으로 옮긴다.
 
 ## 게임 규칙

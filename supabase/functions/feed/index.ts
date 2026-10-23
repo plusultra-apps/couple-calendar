@@ -116,10 +116,10 @@ Deno.serve(async (req) => {
     const lines = [
       'BEGIN:VCALENDAR',
       'VERSION:2.0',
-      'PRODID:-//ourcal//우리달력//KO',
+      'PRODID:-//ourcal//러브로그//KO',
       'CALSCALE:GREGORIAN',
       'METHOD:PUBLISH',
-      'X-WR-CALNAME:우리달력',
+      'X-WR-CALNAME:러브로그',
       'X-WR-TIMEZONE:Asia/Seoul',
       'REFRESH-INTERVAL;VALUE=DURATION:PT1H',
       'X-PUBLISHED-TTL:PT1H',
