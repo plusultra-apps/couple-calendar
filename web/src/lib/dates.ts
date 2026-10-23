@@ -13,8 +13,12 @@ export const todayKey = () => toKey(new Date())
 
 export const fmt = (d: Date, pattern: string) => format(d, pattern, { locale: ko })
 
-// 오후 3:00
-export const fmtTime = (d: Date) => fmt(d, 'a h:mm')
+// 24시간제: 정각이면 '15시', 분이 있으면 '15:30'
+export const fmtTime = (d: Date) => {
+  const h = d.getHours()
+  const m = d.getMinutes()
+  return m === 0 ? `${h}시` : `${h}:${String(m).padStart(2, '0')}`
+}
 
 // 10월 2일 (목)
 export const fmtDay = (d: Date) => fmt(d, 'M월 d일 (EEE)')

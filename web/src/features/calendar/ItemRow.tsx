@@ -13,6 +13,8 @@ export function timeLabel(item: CalItem, day?: DateKey): string {
     return range
   }
   if (item.allDay) return '종일'
+  // 끝 시각 미정(길이 0)은 시작 시각만 보여 준다
+  if (item.start.getTime() === item.end.getTime()) return fmtTime(item.start)
   return `${fmtTime(item.start)} – ${fmtTime(item.end)}`
 }
 

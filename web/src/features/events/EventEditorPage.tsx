@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { addDays, addHours, differenceInMinutes, startOfHour } from 'date-fns'
+import { addDays, differenceInMinutes } from 'date-fns'
 import { useEffect, useState, type FormEvent } from 'react'
 import { EyeOff, Lock, Map as MapIcon, Users, type LucideIcon } from 'lucide-react'
 import { useParams, useSearchParams } from 'react-router-dom'
@@ -26,9 +26,9 @@ type Draft = {
   owner: Owner
   allDay: boolean
   startDate: DateKey
-  startTime: string
-  endDate: DateKey
-  endTime: string
+  startTime: string // '' = 아직 안 고름 (시간 일정은 저장 전 필수)
+  endDate: DateKey // 종일 일정의 끝 날짜
+  durationMin: number // 시간 일정 길이(분). 0 = 미정
   repeat: RepeatPreset
   until: DateKey | ''
   location: string
@@ -37,18 +37,15 @@ type Draft = {
 }
 
 function newDraft(date: DateKey, title: string): Draft {
-  // 오늘이면 다음 정각, 다음 정각이 내일로 넘어가면 오늘 밤 11시
-  const nextHour = startOfHour(addHours(new Date(), 1))
-  const base = date !== todayKey() ? combine(date, '12:00') : toKey(nextHour) === date ? nextHour : combine(date, '23:00')
-  const end = addHours(base, 1)
+  // 시작 시간은 기본값을 두지 않는다('' ). 상대가 그냥 저장해 버리지 않도록 직접 고르게 강제한다.
   return {
     title,
     owner: 'us',
     allDay: false,
-    startDate: toKey(base),
-    startTime: toTimeInput(base),
-    endDate: toKey(end),
-    endTime: toTimeInput(end),
+    startDate: date,
+    startTime: '',
+    endDate: date,
+    durationMin: 60,
     repeat: 'none',
     until: '',
     location: '',
@@ -66,9 +63,9 @@ function draftFromEvent(e: EventWithSecret, userId: string): Draft {
     owner: e.owner_id === null ? 'us' : e.owner_id === userId ? 'me' : 'partner',
     allDay: e.all_day,
     startDate: toKey(start),
-    startTime: e.all_day ? '12:00' : toTimeInput(start),
+    startTime: e.all_day ? '' : toTimeInput(start),
     endDate: toKey(end),
-    endTime: e.all_day ? '13:00' : toTimeInput(end),
+    durationMin: e.all_day ? 60 : Math.max(0, differenceInMinutes(new Date(e.ends_at!), new Date(e.starts_at!))),
     repeat: preset,
     until: until ?? '',
     location: (e.is_private ? e.event_secrets?.location : e.location) ?? '',
@@ -113,17 +110,16 @@ function Editor({ event, userId }: { event: EventWithSecret | null; userId: stri
   const [d, setD] = useState<Draft>(() => {
     if (event) return draftFromEvent(event, userId)
     const draft = newDraft(params.get('date') ?? todayKey(), params.get('title') ?? '')
-    // 빈 시간에서 바로 온 경우: ?start=19:00&min=120
+    // 빈 시간에서 바로 온 경우: ?start=19:00&min=120 (시작 시각이 명시돼 있으니 그대로 채운다)
     const start = params.get('start')
     const min = Number(params.get('min'))
     if (start && /^\d{2}:\d{2}$/.test(start) && min > 0) {
-      const s = combine(params.get('date') ?? todayKey(), start)
-      const e = new Date(s.getTime() + min * 60_000)
-      Object.assign(draft, { startDate: toKey(s), startTime: start, endDate: toKey(e), endTime: toTimeInput(e) })
+      Object.assign(draft, { startTime: start, durationMin: min })
     }
     return draft
   })
   const [error, setError] = useState('')
+  const [timeSignal, setTimeSignal] = useState(0) // 올라갈 때마다 시작 시간 시트가 열린다
   const set = (patch: Partial<Draft>) => setD((prev) => ({ ...prev, ...patch }))
   const quick = useQuickItems()
   const [placeOpen, setPlaceOpen] = useState(false)
@@ -151,7 +147,7 @@ function Editor({ event, userId }: { event: EventWithSecret | null; userId: stri
       const start = combine(d.startDate, item.startTime)
       let end = combine(d.startDate, item.endTime)
       if (end <= start) end = addDays(end, 1)
-      Object.assign(patch, { startTime: item.startTime, endDate: toKey(end), endTime: item.endTime })
+      Object.assign(patch, { startTime: item.startTime, durationMin: Math.max(0, differenceInMinutes(end, start)) })
     }
     set(patch)
   }
@@ -162,8 +158,11 @@ function Editor({ event, userId }: { event: EventWithSecret | null; userId: stri
     title: d.title.trim(),
     ownerId: d.owner === 'us' ? null : d.owner === 'me' ? userId : (partner?.id ?? null),
     allDay: d.allDay,
-    startTime: d.allDay ? null : d.startTime,
-    endTime: d.allDay ? null : d.endTime,
+    startTime: d.allDay ? null : d.startTime || null,
+    endTime:
+      d.allDay || !d.startTime
+        ? null
+        : toTimeInput(new Date(combine(d.startDate, d.startTime).getTime() + d.durationMin * 60_000)),
     repeat: d.repeat === 'none' ? null : d.repeat,
     location: d.location || null,
   })
@@ -173,26 +172,14 @@ function Editor({ event, userId }: { event: EventWithSecret | null; userId: stri
     if (d.owner !== 'me' && d.visibility !== 'shared') set({ visibility: 'shared' })
   }, [d.owner, d.visibility])
 
-  // 시작을 바꾸면 종료도 같은 길이만큼 따라 움직인다
-  function changeStart(date: DateKey, time: string) {
+  // 시작 날짜 바꾸기 (종일은 기간 길이를 유지한 채 끝 날짜도 함께 이동)
+  function changeStartDate(date: DateKey) {
     if (d.allDay) {
       const len = Math.max(0, diffDays(d.endDate, d.startDate))
       set({ startDate: date, endDate: addDaysKey(date, len) })
       return
     }
-    const oldStart = combine(d.startDate, d.startTime)
-    const oldEnd = combine(d.endDate, d.endTime)
-    const minutes = Math.max(0, differenceInMinutes(oldEnd, oldStart))
-    const newStart = combine(date, time)
-    const newEnd = new Date(newStart.getTime() + minutes * 60_000)
-    set({ startDate: date, startTime: time, endDate: toKey(newEnd), endTime: toTimeInput(newEnd) })
-  }
-
-  // '얼마나?' 칩: 시작은 그대로, 끝만 맞춘다
-  const durationMinutes = differenceInMinutes(combine(d.endDate, d.endTime), combine(d.startDate, d.startTime))
-  function setDuration(minutes: number) {
-    const end = new Date(combine(d.startDate, d.startTime).getTime() + minutes * 60_000)
-    set({ endDate: toKey(end), endTime: toTimeInput(end) })
+    set({ startDate: date })
   }
   const setDays = (n: number) => set({ endDate: addDaysKey(d.startDate, n) })
 
@@ -202,10 +189,16 @@ function Editor({ event, userId }: { event: EventWithSecret | null; userId: stri
     const title = d.title.trim()
     if (!title) return setError('제목을 입력해 주세요')
 
-    const start = combine(d.startDate, d.startTime)
-    const end = combine(d.endDate, d.endTime)
-    if (d.allDay ? d.endDate < d.startDate : end < start) return setError('끝나는 시간이 시작보다 빨라요')
+    if (!d.allDay && !d.startTime) {
+      // 아래 작은 에러 문구는 놓치기 쉬워서, 시간 고르기 시트를 바로 열어 직접 고르게 한다
+      setTimeSignal((n) => n + 1)
+      return
+    }
+    if (d.allDay && d.endDate < d.startDate) return setError('끝나는 날이 시작보다 빨라요')
     if (d.repeat !== 'none' && d.until && d.until < d.startDate) return setError('반복 종료일이 시작일보다 빨라요')
+
+    const start = d.allDay ? null : combine(d.startDate, d.startTime)
+    const end = start ? new Date(start.getTime() + d.durationMin * 60_000) : null
 
     const input: EventInput = {
       id: event?.id,
@@ -214,8 +207,8 @@ function Editor({ event, userId }: { event: EventWithSecret | null; userId: stri
       location: d.location,
       memo: d.memo,
       all_day: d.allDay,
-      starts_at: d.allDay ? null : start.toISOString(),
-      ends_at: d.allDay ? null : end.toISOString(),
+      starts_at: start ? start.toISOString() : null,
+      ends_at: end ? end.toISOString() : null,
       start_date: d.allDay ? d.startDate : null,
       end_date: d.allDay ? d.endDate : null,
       rrule: buildRRule(d.repeat, d.until || null, d.startDate),
@@ -292,14 +285,16 @@ function Editor({ event, userId }: { event: EventWithSecret | null; userId: stri
           <div className="flex flex-col gap-1.5">
             <span className="px-1 text-sm font-bold text-ink-soft">시작</span>
             <div className="flex gap-2">
-              <DateButton
-                value={d.startDate}
-                onChange={(date) => changeStart(date, d.startTime)}
-                title="언제 시작해요?"
-                className="flex-1"
-              />
+              <DateButton value={d.startDate} onChange={changeStartDate} title="언제 시작해요?" className="flex-1" />
               {!d.allDay && (
-                <TimeButton value={d.startTime} onChange={(t) => changeStart(d.startDate, t)} title="시작 시간" />
+                <TimeButton
+                  value={d.startTime}
+                  onChange={(t) => set({ startTime: t })}
+                  title="시작 시간"
+                  placeholder="시작 시간 고르기"
+                  openSignal={timeSignal}
+                  hint="약속 시작 시간을 먼저 골라 주세요 ⏰ 1시간 전에 알려 드려요"
+                />
               )}
             </div>
           </div>
@@ -310,12 +305,12 @@ function Editor({ event, userId }: { event: EventWithSecret | null; userId: stri
               {(d.allDay ? DAY_SPANS : DURATIONS).map((opt) => {
                 const active = d.allDay
                   ? diffDays(d.endDate, d.startDate) === opt.value
-                  : durationMinutes === opt.value
+                  : d.durationMin === opt.value
                 return (
                   <button
                     key={opt.label}
                     type="button"
-                    onClick={() => (d.allDay ? setDays(opt.value) : setDuration(opt.value))}
+                    onClick={() => (d.allDay ? setDays(opt.value) : set({ durationMin: opt.value }))}
                     className={`font-display press-3d shrink-0 rounded-full border-2 px-3.5 py-1.5 text-[15px] ${
                       active
                         ? 'border-accent-deep bg-accent text-white [--shade:var(--color-accent-deep)]'
@@ -329,20 +324,19 @@ function Editor({ event, userId }: { event: EventWithSecret | null; userId: stri
             </div>
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <span className="px-1 text-sm font-bold text-ink-soft">끝</span>
-            <div className="flex gap-2">
+          {/* 종일 일정만 끝나는 '날'을 고른다. 시간 일정은 위 '얼마나?'(길이)로 끝 시각이 정해진다. */}
+          {d.allDay && (
+            <div className="flex flex-col gap-1.5">
+              <span className="px-1 text-sm font-bold text-ink-soft">끝</span>
               <DateButton
                 value={d.endDate}
                 min={d.startDate}
                 onChange={(date) => set({ endDate: date })}
                 title="언제 끝나요?"
                 quick={false}
-                className="flex-1"
               />
-              {!d.allDay && <TimeButton value={d.endTime} onChange={(t) => set({ endTime: t })} title="끝나는 시간" />}
             </div>
-          </div>
+          )}
         </Card>
 
         <Card className="flex flex-col gap-3 p-4">
@@ -465,12 +459,11 @@ function Editor({ event, userId }: { event: EventWithSecret | null; userId: stri
 
 
 const DURATIONS = [
-  { label: '30분', value: 30 },
   { label: '1시간', value: 60 },
-  { label: '1시간 반', value: 90 },
   { label: '2시간', value: 120 },
   { label: '3시간', value: 180 },
-  { label: '반나절', value: 240 },
+  { label: '4시간', value: 240 },
+  { label: '미정', value: 0 }, // 끝 시각을 안 정함 (시작 시각만)
 ]
 
 const DAY_SPANS = [

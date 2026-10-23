@@ -67,7 +67,11 @@ function whenText(event: EventWithSecret, date: DateKey | null): string {
   if (event.all_day) {
     return span.startKey === span.endKey ? `${fmtDay(span.start)} · 종일` : `${fmtDay(span.start)} – ${fmtDay(span.end)}`
   }
-  if (span.startKey === span.endKey) return `${fmtDay(span.start)} · ${fmtTime(span.start)} – ${fmtTime(span.end)}`
+  if (span.startKey === span.endKey) {
+    // 끝 시각 미정(길이 0)은 시작 시각만
+    if (span.start.getTime() === span.end.getTime()) return `${fmtDay(span.start)} · ${fmtTime(span.start)}`
+    return `${fmtDay(span.start)} · ${fmtTime(span.start)} – ${fmtTime(span.end)}`
+  }
   return `${fmtDay(span.start)} ${fmtTime(span.start)} – ${fmtDay(span.end)} ${fmtTime(span.end)}`
 }
 

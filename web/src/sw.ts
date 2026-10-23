@@ -26,14 +26,18 @@ self.addEventListener('push', (event) => {
     p = { body: event.data?.text() }
   }
   event.waitUntil(
-    self.registration.showNotification(p.title || '우리달력', {
-      body: p.body ?? '',
-      icon: '/pwa-192x192.png',
-      // 안드로이드 상단 작은 아이콘은 모양(투명도)만 쓴다 → 흰색 달력 실루엣 (컬러 아이콘이면 네모·동그라미로 보임)
-      badge: '/badge-96x96.png',
-      tag: p.tag,
-      data: { url: p.url || '/' },
-    }),
+    Promise.all([
+      self.registration.showNotification(p.title || '우리달력', {
+        body: p.body ?? '',
+        icon: '/pwa-192x192.png',
+        // 안드로이드 상단 작은 아이콘은 모양(투명도)만 쓴다 → 흰색 달력 실루엣 (컬러 아이콘이면 네모·동그라미로 보임)
+        badge: '/badge-96x96.png',
+        tag: p.tag,
+        data: { url: p.url || '/' },
+      }),
+      // 업데이트 알림을 받으면 그 자리에서 새 버전을 확인한다 → 앱이 떠 있으면 거의 바로 갱신
+      p.tag === 'app-update' ? self.registration.update().catch(() => {}) : Promise.resolve(),
+    ]),
   )
 })
 

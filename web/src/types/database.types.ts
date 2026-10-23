@@ -220,6 +220,32 @@ export type Database = {
           },
         ]
       }
+      event_reminders: {
+        Row: {
+          event_id: string
+          occ_key: string
+          sent_at: string
+        }
+        Insert: {
+          event_id: string
+          occ_key: string
+          sent_at?: string
+        }
+        Update: {
+          event_id?: string
+          occ_key?: string
+          sent_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_reminders_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_secrets: {
         Row: {
           event_id: string

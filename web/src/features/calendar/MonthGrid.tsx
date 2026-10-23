@@ -8,7 +8,6 @@ import { compareItems, type CalItem } from './items'
 
 const HEAD_H = 25 // 날짜 숫자 영역
 const LANE_H = 18 // 일정 막대 한 줄
-const MORE_H = 16 // 못 그린 일정 '+N' 한 줄
 const MIN_PHOTO_H = 36 // 사진 보기에서 사진에 남겨 둘 최소 높이
 
 // 사진 보기에서 칸을 채우는 그림. url(실제 사진) 또는 background+emoji(튜토리얼 연습용 그림). count = 그날 사진 수
@@ -71,9 +70,10 @@ export function MonthGrid({
     return () => ro.disconnect()
   }, [])
 
-  // 줄 수: 칸 높이에 맞춰서. 사진 보기에선 사진 자리를 남기고 일정은 1~2줄 (+N 줄 자리도 남긴다)
+  // 줄 수: 칸 높이에 맞춰서. 사진 보기에선 사진 자리(최소 높이)를 남기고 일정은 1~2줄.
+  // 못 그린 일정 '+N' 은 아래 새 줄이 아니라 마지막 일정 줄 오른쪽에 붙여서 사진 높이를 아끼지 않는다.
   const maxLanes = Math.max(1, Math.floor((rowH - HEAD_H - 2) / LANE_H))
-  const photoLanes = Math.min(2, Math.max(1, Math.floor((rowH - HEAD_H - MORE_H - MIN_PHOTO_H - 2) / LANE_H)))
+  const photoLanes = Math.min(2, Math.max(1, Math.floor((rowH - HEAD_H - MIN_PHOTO_H - 2) / LANE_H)))
   const weeks = useMemo(() => Array.from({ length: 6 }, (_, w) => days.slice(w * 7, w * 7 + 7)), [days])
   const today = todayKey()
 
@@ -83,15 +83,19 @@ export function MonthGrid({
         const keys = week.map(toKey)
         const segs = layoutWeek(keys, items)
         const overflow = segs.some((s) => s.lane >= maxLanes)
-        // 사진 자리를 남기는 건 사진 있는 날이 낀 주만
-        const photoWeek = photoMode && keys.some((k) => photos?.[k])
-        const visibleLanes = photoWeek ? photoLanes : overflow ? maxLanes - 1 : maxLanes
-        const hidden = keys.map((_, col) => segs.filter((s) => s.lane >= visibleLanes && s.s <= col && s.e >= col).length)
-        // 사진 보기: 그날 보이는 일정 막대(+N 줄) 바로 아래부터 사진
-        const photoTop = keys.map((_, col) => {
-          const lanes = Math.max(0, ...segs.filter((s) => s.lane < visibleLanes && s.s <= col && s.e >= col).map((s) => s.lane + 1))
-          return HEAD_H + (hidden[col] > 0 ? visibleLanes * LANE_H + MORE_H : lanes * LANE_H)
-        })
+        // 날짜별 보이는 일정 줄 수: 사진 보기에서 '사진이 있는 날'만 사진 자리를 남기고,
+        // 사진 없는 날은 평소처럼 일정을 꽉 채운다(+N 으로 줄이지 않는다)
+        const dayLanes = keys.map((k) =>
+          photoMode && photos?.[k] ? photoLanes : overflow ? maxLanes - 1 : maxLanes,
+        )
+        // 한 막대는 걸치는 모든 날의 줄 수 안에 들어와야 보인다(여러 날 막대는 가장 빡빡한 날 기준)
+        const segBudget = (s: Seg) => Math.min(...dayLanes.slice(s.s, s.e + 1))
+        const hidden = keys.map((_, col) => segs.filter((s) => s.s <= col && s.e >= col && s.lane >= segBudget(s)).length)
+        // 그날 실제로 쓰는 일정 줄 수 (보이는 막대 줄 + 가린 게 있으면 '+N' 붙일 줄 1개는 확보)
+        const visLanes = keys.map((_, col) => Math.max(0, ...segs.filter((s) => s.s <= col && s.e >= col && s.lane < segBudget(s)).map((s) => s.lane + 1)))
+        const laneRows = keys.map((_, col) => Math.max(visLanes[col], hidden[col] > 0 ? 1 : 0))
+        // 사진 보기: 일정 줄 바로 아래부터 사진 ('+N' 은 줄을 더 먹지 않는다)
+        const photoTop = keys.map((_, col) => HEAD_H + laneRows[col] * LANE_H)
 
         return (
           <div key={keys[0]} className="relative min-h-0 border-t-2 border-dashed border-line/70 first:border-t-0">
@@ -146,21 +150,35 @@ export function MonthGrid({
 
             <div className="pointer-events-none absolute inset-x-0" style={{ top: HEAD_H }}>
               {segs
-                .filter((s) => s.lane < visibleLanes)
+                .filter((s) => s.lane < segBudget(s))
                 .map((seg) => (
                   <Bar key={`${seg.item.key}-${keys[0]}`} seg={seg} />
                 ))}
-              {hidden.map((n, col) =>
-                n > 0 ? (
+              {hidden.map((n, col) => {
+                if (n <= 0) return null
+                // 사진 있는 날: 사진이 눌리지 않게 마지막 일정 줄 '오른쪽'에 작은 알약으로
+                if (photoMode && photos?.[keys[col]]) {
+                  return (
+                    <span
+                      key={col}
+                      className="absolute flex items-center justify-end pr-1"
+                      style={{ left: `calc(${col} * 100% / 7)`, width: 'calc(100% / 7)', top: (laneRows[col] - 1) * LANE_H, height: LANE_H }}
+                    >
+                      <span className="rounded-full bg-white/85 px-1 text-[9px] leading-[13px] font-bold text-ink-soft shadow-sm">+{n}</span>
+                    </span>
+                  )
+                }
+                // 평소: 일정 줄 아래에 '+N'
+                return (
                   <span
                     key={col}
                     className="absolute truncate px-1 text-[10px] font-semibold leading-4 text-ink-soft"
-                    style={{ left: `calc(${col} * 100% / 7)`, width: 'calc(100% / 7)', top: visibleLanes * LANE_H }}
+                    style={{ left: `calc(${col} * 100% / 7)`, width: 'calc(100% / 7)', top: dayLanes[col] * LANE_H }}
                   >
                     +{n}
                   </span>
-                ) : null,
-              )}
+                )
+              })}
             </div>
           </div>
         )

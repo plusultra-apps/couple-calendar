@@ -12,8 +12,9 @@ import { DateButton } from '../../components/DateTimePicker'
 import { daysTogether } from '../../lib/anniversary'
 import { todayKey } from '../../lib/dates'
 import { supabase, toMessage } from '../../lib/supabase'
-import { ExternalCalendarsSettings } from '../external/ExternalCalendarsSettings'
-import { FeedSettings } from '../feed/FeedSettings'
+// 핸드폰 달력 연동(피드 구독)·회사 캘린더 가져오기는 당분간 숨김 — 다시 쓰려면 주석을 풀면 된다
+// import { ExternalCalendarsSettings } from '../external/ExternalCalendarsSettings'
+// import { FeedSettings } from '../feed/FeedSettings'
 import { IosInstallSteps } from '../install/IosInstallSteps'
 import { isIOS, isStandalone, promptInstall, useCanInstall } from '../install/platform'
 import { PushSettings } from '../push/PushSettings'
@@ -35,8 +36,9 @@ export function SettingsPage() {
         <UsSection />
         <PlaySection />
         <PushSettings />
-        <FeedSettings />
-        <ExternalCalendarsSettings />
+        {/* 핸드폰 기본 캘린더 연동·회사 캘린더 가져오기 — 당분간 숨김 (위 import 주석과 함께 되돌리면 된다) */}
+        {/* <FeedSettings /> */}
+        {/* <ExternalCalendarsSettings /> */}
         <InstallSection />
         <ExportSection />
         <TutorialSection />
