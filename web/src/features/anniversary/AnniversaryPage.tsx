@@ -49,6 +49,18 @@ export function AnniversaryPage() {
       <PageHeader title="기념일" />
       <div className="flex flex-col gap-4 px-4 pt-1">
         <HeroCard />
+        <Link
+          to="/beans"
+          className="font-display press-3d flex items-center gap-3 rounded-[22px] border-2 border-line bg-surface px-4 py-3 active:scale-[0.98]"
+        >
+          <span className="text-2xl" aria-hidden>
+            🫙
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-lg leading-tight">콩 기록</span>
+          </span>
+          <ChevronRight className="h-5 w-5 shrink-0 text-ink-soft" aria-hidden />
+        </Link>
         <DayCalculator />
         <BirthdayHint />
 

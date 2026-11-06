@@ -93,29 +93,24 @@ const KINDS: { kind: string; tab: PrefTab; label: string; description?: string }
   { kind: 'update', tab: 'etc', label: '🆕 앱 업데이트 소식', description: '새 기능이 생기거나 고쳐졌을 때' },
 ]
 
-// 종류별 끄기 · 조용한 시간. 꺼도 앱 안 알림함(🔔)에는 남는다.
+// 종류별 끄기. 꺼도 앱 안 알림함(🔔)에는 남는다. (조용한 시간은 2026-11-05 에 없앴다)
 function NotifyPrefs() {
   const { me } = useCoupleCtx()
   const update = useUpdateProfile(me.id)
   const [off, setOff] = useState<string[]>(me.notify_off)
-  const [quiet, setQuiet] = useState(me.quiet_hours)
   const [tab, setTab] = useState<PrefTab>('cal')
   const [error, setError] = useState('')
 
-  const save = async (patch: { notify_off?: string[]; quiet_hours?: boolean }) => {
+  const toggleKind = async (kind: string, on: boolean) => {
+    const next = on ? off.filter((k) => k !== kind) : [...off, kind]
     setError('')
+    setOff(next)
     try {
-      await update.mutateAsync(patch)
+      await update.mutateAsync({ notify_off: next })
     } catch (e) {
       setError(toMessage(e))
       setOff(me.notify_off)
-      setQuiet(me.quiet_hours)
     }
-  }
-  const toggleKind = (kind: string, on: boolean) => {
-    const next = on ? off.filter((k) => k !== kind) : [...off, kind]
-    setOff(next)
-    save({ notify_off: next })
   }
 
   const shown = KINDS.filter((k) => k.tab === tab)
@@ -135,18 +130,6 @@ function NotifyPrefs() {
             description={k.description}
           />
         ))}
-      </div>
-      {/* 조용한 시간은 모든 알림에 걸리는 설정이라 탭과 상관없이 늘 보여 준다 */}
-      <div className="mt-2 border-t-2 border-dashed border-line pt-2">
-        <Toggle
-          checked={quiet}
-          onChange={(on) => {
-            setQuiet(on)
-            save({ quiet_hours: on })
-          }}
-          label="🌙 조용한 시간 (밤 11시 ~ 아침 7시)"
-          description="그 사이 온 알림은 울리지 않고 모아 두었다가 아침 7시에 한 번에 알려 줘요"
-        />
       </div>
       <ErrorText>{error}</ErrorText>
     </div>

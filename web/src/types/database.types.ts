@@ -125,6 +125,99 @@ export type Database = {
         }
         Relationships: []
       }
+      bean_logs: {
+        Row: {
+          couple_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          kind: string | null
+          taken_on: string
+          type_id: string | null
+        }
+        Insert: {
+          couple_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kind?: string | null
+          taken_on: string
+          type_id?: string | null
+        }
+        Update: {
+          couple_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kind?: string | null
+          taken_on?: string
+          type_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bean_logs_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bean_logs_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bean_logs_type_id_fkey"
+            columns: ["type_id"]
+            isOneToOne: false
+            referencedRelation: "bean_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bean_types: {
+        Row: {
+          archived: boolean
+          color: string
+          couple_id: string
+          created_at: string
+          emoji: string
+          id: string
+          label: string
+          sort_order: number
+        }
+        Insert: {
+          archived?: boolean
+          color?: string
+          couple_id?: string
+          created_at?: string
+          emoji?: string
+          id?: string
+          label: string
+          sort_order?: number
+        }
+        Update: {
+          archived?: boolean
+          color?: string
+          couple_id?: string
+          created_at?: string
+          emoji?: string
+          id?: string
+          label?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bean_types_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_comments: {
         Row: {
           body: string

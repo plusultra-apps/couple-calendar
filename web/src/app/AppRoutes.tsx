@@ -10,6 +10,7 @@ const named = <K extends string>(load: () => Promise<Record<K, React.ComponentTy
 
 const WishPage = named(() => import('../features/wish/WishPage'), 'WishPage')
 const AnniversaryPage = named(() => import('../features/anniversary/AnniversaryPage'), 'AnniversaryPage')
+const BeansPage = named(() => import('../features/beans/BeansPage'), 'BeansPage')
 const MemoriesPage = named(() => import('../features/photos/MemoriesPage'), 'MemoriesPage')
 const SettingsPage = named(() => import('../features/settings/SettingsPage'), 'SettingsPage')
 const FreeTimePage = named(() => import('../features/free/FreeTimePage'), 'FreeTimePage')
@@ -30,6 +31,7 @@ export function AppRoutes() {
         <Route path="wish" element={<WishPage />} />
         <Route path="memories" element={<MemoriesPage />} />
         <Route path="anniv" element={<AnniversaryPage />} />
+        <Route path="beans" element={<BeansPage />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>
       <Route element={<StackLayout />}>
