@@ -32,7 +32,8 @@ export function JarPhysics({ beans, compact = false }: { beans: JarBean[]; compa
   const shakeRef = useRef<(strength: number) => void>(() => {})
   const motionRef = useRef<{ request: () => Promise<void> } | null>(null)
 
-  const [motion, setMotion] = useState<'checking' | 'need' | 'on' | 'none'>('checking')
+  // 센서 상태 (화면에는 따로 보여 주지 않는다)
+  const [, setMotion] = useState<'checking' | 'need' | 'on' | 'none'>('checking')
   const [sound, setSound] = useState(beanSoundOn())
 
   // 물리 세계 + 그리기 + 센서: 병이 화면에 있는 동안만 돈다
@@ -48,6 +49,8 @@ export function JarPhysics({ beans, compact = false }: { beans: JarBean[]; compa
     const world = engine.world
     Matter.Composite.add(world, [
       Matter.Bodies.rectangle(W / 2, H + 20, W + 40, 40, { isStatic: true, friction: 0.8, restitution: 0.1, label: 'wall' }),
+      // 천장: 뚜껑 쪽으로 튀어 올라가 사라지지 않게 막는다
+      Matter.Bodies.rectangle(W / 2, -20, W + 40, 40, { isStatic: true, restitution: 0.1, label: 'wall' }),
       Matter.Bodies.rectangle(-20, H / 2, 40, H * 3, { isStatic: true, label: 'wall' }),
       Matter.Bodies.rectangle(W + 20, H / 2, 40, H * 3, { isStatic: true, label: 'wall' }),
     ])
@@ -167,6 +170,13 @@ export function JarPhysics({ beans, compact = false }: { beans: JarBean[]; compa
     let last = performance.now()
     const frame = (t: number) => {
       Matter.Engine.update(engine, Math.min(33, t - last))
+      // 혹시 벽을 뚫고 나간 콩은 병 안쪽으로 되돌린다 (안전장치)
+      for (const { body } of entries.values()) {
+        const r = (body.circleRadius ?? 8)
+        const x = Math.min(W - r, Math.max(r, body.position.x))
+        const y = Math.min(H - r, Math.max(r, body.position.y))
+        if (x !== body.position.x || y !== body.position.y) Matter.Body.setPosition(body, { x, y })
+      }
       last = t
       draw()
       raf = requestAnimationFrame(frame)
@@ -183,8 +193,11 @@ export function JarPhysics({ beans, compact = false }: { beans: JarBean[]; compa
       setMotion('on')
     }
     if (compact || !DM) setMotion('none') // 지난 병은 기울이지 않는다
-    else if (typeof DM.requestPermission === 'function') setMotion('need')
-    else attach()
+    else if (typeof DM.requestPermission === 'function') {
+      // iOS: 권한은 사용자 터치 안에서만 물어볼 수 있어서, 페이지의 첫 터치에 요청한다
+      setMotion('need')
+      window.addEventListener('pointerdown', () => motionRef.current?.request(), { once: true })
+    } else attach()
 
     // 리셋용 노출 (권한 버튼에서 쓴다)
     motionRef.current = {
@@ -217,6 +230,7 @@ export function JarPhysics({ beans, compact = false }: { beans: JarBean[]; compa
 
   const onTapJar = () => {
     unlockBeanSound()
+    void motionRef.current?.request() // iOS 권한 요청 (이미 허용됐으면 아무 일도 없다)
     shakeRef.current(10)
   }
 
@@ -232,15 +246,6 @@ export function JarPhysics({ beans, compact = false }: { beans: JarBean[]; compa
 
       {!compact && (
       <div className="flex flex-wrap items-center justify-center gap-2">
-        {motion === 'need' && (
-          <button
-            type="button"
-            onClick={() => motionRef.current?.request()}
-            className="font-display rounded-full border-2 border-accent-deep bg-accent px-3.5 py-1.5 text-[14px] text-white active:scale-95"
-          >
-            📳 폰 기울이기 켜기
-          </button>
-        )}
         <button
           type="button"
           onClick={() => {

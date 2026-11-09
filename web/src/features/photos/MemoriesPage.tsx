@@ -15,7 +15,7 @@ import type { Photo } from '../../types/database'
 import { useAnnivInput } from '../anniversary/queries'
 import { displayTitle } from '../events/queries'
 import { useToggleLike, usePhotoLikes } from './likes'
-import { PhotoGrid, PhotoUploadButton } from './PhotoGrid'
+import { PhotoGrid, PhotoUploadButton, PhotoViewer } from './PhotoGrid'
 import { usePhotos, useUpdatePhoto } from './queries'
 
 const VIEW_KEY = 'ourcal.memories.view'
@@ -147,6 +147,8 @@ function PostCard({ post, event }: { post: Post; event?: { title: string; locati
   const [editing, setEditing] = useState(false)
   const [caption, setCaption] = useState(post.photos[0].caption ?? '')
   const lastTap = useRef(0)
+  const tapTimer = useRef<number | undefined>(undefined)
+  const [viewer, setViewer] = useState(false)
   const scroller = useRef<HTMLDivElement>(null)
 
   const current = post.photos[Math.min(index, post.photos.length - 1)]
@@ -159,11 +161,15 @@ function PostCard({ post, event }: { post: Post; event?: { title: string; locati
   // 첫 사진 비율로 높이를 정한다 (세로 4:5 ~ 가로 1.91:1 사이)
   const ratio = first.width && first.height ? Math.min(1.91, Math.max(0.8, first.width / first.height)) : 1
 
+  // 한 번 탭: 원본 크기로 보기 / 두 번 탭: 하트
   function onTap() {
     const now = Date.now()
     if (now - lastTap.current < 300) {
+      window.clearTimeout(tapTimer.current)
       setBurst((b) => b + 1)
       if (!liked) toggle.mutate({ photoId: current.id, on: true })
+    } else {
+      tapTimer.current = window.setTimeout(() => setViewer(true), 300)
     }
     lastTap.current = now
   }
@@ -236,6 +242,7 @@ function PostCard({ post, event }: { post: Post; event?: { title: string; locati
           ))}
         </div>
         {/* 두 번 탭 하트 */}
+        {viewer && <PhotoViewer photos={post.photos} index={index} onIndex={setIndex} onClose={() => setViewer(false)} />}
         {burst > 0 && (
           <Heart
             key={burst}

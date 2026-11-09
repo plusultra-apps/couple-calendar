@@ -207,7 +207,7 @@ function useLongPressSort(photos: Photo[], onReorder?: (photos: Photo[]) => Prom
   }
 }
 
-function PhotoViewer({
+export function PhotoViewer({
   photos,
   index,
   onIndex,

@@ -20,6 +20,8 @@ export function demoCouple(real: CoupleWithMembers, userId: string): CoupleWithM
     birthday_is_lunar: false,
     created_at: me.created_at,
     photo_path: null,
+    photo_x: 50,
+    photo_y: 50,
     notify_off: [],
     quiet_hours: true,
   }

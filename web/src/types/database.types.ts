@@ -95,6 +95,8 @@ export type Database = {
       couples: {
         Row: {
           cover_path: string | null
+          cover_x: number
+          cover_y: number
           created_at: string
           day_every: number | null
           day_marks: number[]
@@ -105,6 +107,8 @@ export type Database = {
         }
         Insert: {
           cover_path?: string | null
+          cover_x?: number
+          cover_y?: number
           created_at?: string
           day_every?: number | null
           day_marks?: number[]
@@ -115,6 +119,8 @@ export type Database = {
         }
         Update: {
           cover_path?: string | null
+          cover_x?: number
+          cover_y?: number
           created_at?: string
           day_every?: number | null
           day_marks?: number[]
@@ -1011,6 +1017,8 @@ export type Database = {
           nickname: string
           notify_off: string[]
           photo_path: string | null
+          photo_x: number
+          photo_y: number
           quiet_hours: boolean
         }
         Insert: {
@@ -1024,6 +1032,8 @@ export type Database = {
           nickname?: string
           notify_off?: string[]
           photo_path?: string | null
+          photo_x?: number
+          photo_y?: number
           quiet_hours?: boolean
         }
         Update: {
@@ -1037,6 +1047,8 @@ export type Database = {
           nickname?: string
           notify_off?: string[]
           photo_path?: string | null
+          photo_x?: number
+          photo_y?: number
           quiet_hours?: boolean
         }
         Relationships: [
@@ -1251,6 +1263,8 @@ export type Database = {
         Args: { p_started_on: string }
         Returns: {
           cover_path: string | null
+          cover_x: number
+          cover_y: number
           created_at: string
           day_every: number | null
           day_marks: number[]
@@ -1271,6 +1285,8 @@ export type Database = {
         Args: { p_code: string }
         Returns: {
           cover_path: string | null
+          cover_x: number
+          cover_y: number
           created_at: string
           day_every: number | null
           day_marks: number[]
