@@ -1,4 +1,4 @@
-import { Cake, Calculator, Check, ChevronDown, ChevronRight, Plus } from 'lucide-react'
+import { BookOpen, Cake, Calculator, Check, ChevronDown, ChevronRight, Plus } from 'lucide-react'
 import { useMemo, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { useCoupleCtx } from '../../app/couple'
@@ -58,6 +58,18 @@ export function AnniversaryPage() {
           </span>
           <span className="min-w-0 flex-1">
             <span className="block text-lg leading-tight">콩 기록</span>
+          </span>
+          <ChevronRight className="h-5 w-5 shrink-0 text-ink-soft" aria-hidden />
+        </Link>
+        <Link
+          to="/books"
+          className="font-display press-3d flex items-center gap-3 rounded-[22px] border-2 border-line bg-surface px-4 py-3 active:scale-[0.98]"
+        >
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] bg-partner/30" aria-hidden>
+            <BookOpen className="h-5 w-5 text-accent-deep" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-lg leading-tight">우리 서재</span>
           </span>
           <ChevronRight className="h-5 w-5 shrink-0 text-ink-soft" aria-hidden />
         </Link>

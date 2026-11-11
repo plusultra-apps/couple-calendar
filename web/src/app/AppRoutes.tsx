@@ -11,6 +11,9 @@ const named = <K extends string>(load: () => Promise<Record<K, React.ComponentTy
 const WishPage = named(() => import('../features/wish/WishPage'), 'WishPage')
 const AnniversaryPage = named(() => import('../features/anniversary/AnniversaryPage'), 'AnniversaryPage')
 const BeansPage = named(() => import('../features/beans/BeansPage'), 'BeansPage')
+const BooksPage = named(() => import('../features/books/BooksPage'), 'BooksPage')
+const BookSearchPage = named(() => import('../features/books/BookSearchPage'), 'BookSearchPage')
+const BookDetailPage = named(() => import('../features/books/BookDetailPage'), 'BookDetailPage')
 const MemoriesPage = named(() => import('../features/photos/MemoriesPage'), 'MemoriesPage')
 const SettingsPage = named(() => import('../features/settings/SettingsPage'), 'SettingsPage')
 const FreeTimePage = named(() => import('../features/free/FreeTimePage'), 'FreeTimePage')
@@ -32,6 +35,9 @@ export function AppRoutes() {
         <Route path="memories" element={<MemoriesPage />} />
         <Route path="anniv" element={<AnniversaryPage />} />
         <Route path="beans" element={<BeansPage />} />
+        <Route path="books" element={<BooksPage />} />
+        <Route path="books/search" element={<BookSearchPage />} />
+        <Route path="books/:id" element={<BookDetailPage />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>
       <Route element={<StackLayout />}>

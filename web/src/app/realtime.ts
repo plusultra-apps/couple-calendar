@@ -23,6 +23,9 @@ const TABLE_KEYS: Record<string, string[][]> = {
   poker_hands: [['poker']],
   bean_logs: [['beans']],
   bean_types: [['bean-types']],
+  book_logs: [['books']],
+  book_notes: [['book-notes']],
+  book_progress: [['books']],
 }
 
 // 커플 데이터 실시간 구독. 상대가 바꾸면 내 화면이 즉시 갱신된다.
@@ -36,7 +39,7 @@ export function useCoupleRealtime(coupleId: string) {
 
     // 같은 이름의 채널이 아직 정리 중일 때(StrictMode·빠른 재마운트) 재사용되지 않게 실행마다 고유한 이름을 쓴다
     let channel = supabase.channel(`couple:${coupleId}:${crypto.randomUUID()}`)
-    for (const table of ['events', 'event_comments', 'event_reactions', 'anniversaries', 'wishes', 'external_busy', 'profiles', 'quick_templates', 'photos', 'photo_likes', 'notifications', 'poker_games', 'poker_players', 'poker_rounds', 'poker_hands', 'bean_logs', 'bean_types']) {
+    for (const table of ['events', 'event_comments', 'event_reactions', 'anniversaries', 'wishes', 'external_busy', 'profiles', 'quick_templates', 'photos', 'photo_likes', 'notifications', 'poker_games', 'poker_players', 'poker_rounds', 'poker_hands', 'bean_logs', 'bean_types', 'book_logs', 'book_notes', 'book_progress']) {
       channel = channel.on(
         'postgres_changes',
         { event: '*', schema: 'public', table, filter: `couple_id=eq.${coupleId}` },
@@ -56,6 +59,9 @@ export function useCoupleRealtime(coupleId: string) {
       .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'anniversaries' }, () => invalidate('anniversaries'))
       .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'bean_logs' }, () => invalidate('bean_logs'))
       .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'bean_types' }, () => invalidate('bean_types'))
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'book_logs' }, () => invalidate('book_logs'))
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'book_notes' }, () => invalidate('book_notes'))
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'book_progress' }, () => invalidate('book_progress'))
     channel.subscribe()
 
     // 앱으로 돌아오면(백그라운드 → 포그라운드) 놓친 변경을 다시 가져온다

@@ -131,6 +131,161 @@ export type Database = {
         }
         Relationships: []
       }
+      book_logs: {
+        Row: {
+          authors: string | null
+          couple_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          isbn: string
+          publisher: string | null
+          thumbnail: string | null
+          title: string
+        }
+        Insert: {
+          authors?: string | null
+          couple_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          isbn: string
+          publisher?: string | null
+          thumbnail?: string | null
+          title: string
+        }
+        Update: {
+          authors?: string | null
+          couple_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          isbn?: string
+          publisher?: string | null
+          thumbnail?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "book_logs_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "book_logs_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      book_progress: {
+        Row: {
+          book_id: string
+          couple_id: string
+          finished_on: string | null
+          rating: number | null
+          started_on: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          book_id: string
+          couple_id?: string
+          finished_on?: string | null
+          rating?: number | null
+          started_on?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          book_id?: string
+          couple_id?: string
+          finished_on?: string | null
+          rating?: number | null
+          started_on?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "book_progress_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "book_logs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "book_progress_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "book_progress_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      book_notes: {
+        Row: {
+          body: string
+          book_id: string
+          couple_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          book_id: string
+          couple_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Update: {
+          body?: string
+          book_id?: string
+          couple_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "book_notes_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "book_logs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "book_notes_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "book_notes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bean_logs: {
         Row: {
           couple_id: string
